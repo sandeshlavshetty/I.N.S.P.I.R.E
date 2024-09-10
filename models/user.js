@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect("mongodb://127.0.0.1:27017/bus_poll");
+mongoose.connect("mongodb+srv://admin:mongoDB@users.cfn02.mongodb.net/");
 
 const userSchema = mongoose.Schema({
     btid: String,
