@@ -1,0 +1,83 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 15px;
+    color: white;
+}
+
+header .logo h1 {
+    font-size: 1.5em;
+    margin-left: 10px;
+}
+
+header .logout a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+header .logout a:hover {
+    text-decoration: underline;
+}
+
+main {
+    margin-top: 20px;
+}
+
+.poll-form {
+    background-color: #f4f4f4;
+    padding: 20px;
+    border: 2px solid #ccc;
+    width: 50%;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+.poll-about h2 {
+    margin-bottom: 10px;
+}
+
+.poll-about p {
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 15px;
+}
+
+form input[type="radio"] {
+    margin-right: 10px;
+}
+
+button[type="submit"] {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #555;
+}
