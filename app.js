@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
-
+require('dotenv').config();
 
 app.get("/", (req, res) => {
     res.render("index");
@@ -87,7 +87,8 @@ app.post('/register', async (req, res) => {
 
 app.get('/admin', isLoggedIn, async (req, res) => {
     const users = await userModel.find();
-    res.render('admin', { user: users });
+   
+    res.render('admin', { user: users});
 });
 
 app.get('/poll', isLoggedIn, async (req, res) => {
@@ -244,6 +245,37 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
 });
 
 
+// app.get('/stop_poll', isLoggedIn, async (req, res) => {
+//     try {
+//         // Find the latest poll entry
+//         let latestPollEntry = await pollModel.findOne({ visibility: "1" });
+
+//         if (latestPollEntry) {
+//             const documentIdToUpdate = latestPollEntry._id;
+
+//             // Update the visibility field
+//             const result = await pollModel.updateOne(
+//                 { _id: documentIdToUpdate },
+//                 { $set: { visibility: '0' } }
+//             ).exec();
+            
+//             if (result > 0) {
+//                 console.log('Document updated successfully:', result);
+//             } else {
+//                 console.log('No documents matched the query. Document not updated.');
+//             }
+//                 } else {
+//             console.log('No poll entries found.');
+//         }
+
+//         res.status(200).redirect('/admin');
+        
+//     } catch (err) {
+//         console.error('Error updating document:', err);
+//         res.status(500).send('Error stopping poll.');
+//     }
+// });
+
 app.get('/stop_poll', isLoggedIn, async (req, res) => {
     try {
         // Find the latest poll entry
@@ -257,22 +289,50 @@ app.get('/stop_poll', isLoggedIn, async (req, res) => {
                 { _id: documentIdToUpdate },
                 { $set: { visibility: '0' } }
             ).exec();
-
-            if (result.nModified > 0) {
+            
+            if (result.modifiedCount > 0) {
                 console.log('Document updated successfully:', result);
             } else {
                 console.log('No documents matched the query. Document not updated.');
             }
-            res.render("admin", { op1_n: latestPollEntry.option1_name, op2_n: latestPollEntry.option2_name, op3_n: latestPollEntry.option3_name, op4_n: latestPollEntry.option4_name, op5_n: latestPollEntry.option5_name, op1: latestPollEntry.option1, op2:latestPollEntry.option2, op3: latestPollEntry.option3, op4: latestPollEntry.option4, op5: latestPollEntry.option5,poll_result:1 });
         } else {
             console.log('No poll entries found.');
         }
 
-        res.status(200).redirect('/admin');
+        // Redirect to the poll results page and pass the poll data
+        res.render("poll_results", {
+            poll_result: latestPollEntry ? 1 : 0,
+            op1_n: latestPollEntry ? latestPollEntry.option1_name : null,
+            op2_n: latestPollEntry ? latestPollEntry.option2_name : null,
+            op3_n: latestPollEntry ? latestPollEntry.option3_name : null,
+            op4_n: latestPollEntry ? latestPollEntry.option4_name : null,
+            op5_n: latestPollEntry ? latestPollEntry.option5_name : null,
+            op1: latestPollEntry ? latestPollEntry.option1 : 0,
+            op2: latestPollEntry ? latestPollEntry.option2 : 0,
+            op3: latestPollEntry ? latestPollEntry.option3 : 0,
+            op4: latestPollEntry ? latestPollEntry.option4 : 0,
+            op5: latestPollEntry ? latestPollEntry.option5 : 0
+        });
     } catch (err) {
         console.error('Error updating document:', err);
         res.status(500).send('Error stopping poll.');
     }
 });
 
+
+
+// res.redirect("/admin", {
+//     poll_result: latestPollEntry ? 1 : 0,
+//     op1_n: latestPollEntry ? latestPollEntry.option1_name : null,
+//     op2_n: latestPollEntry ? latestPollEntry.option2_name : null,
+//     op3_n: latestPollEntry ? latestPollEntry.option3_name : null,
+//     op4_n: latestPollEntry ? latestPollEntry.option4_name : null,
+//     op5_n: latestPollEntry ? latestPollEntry.option5_name : null,
+//     op1: latestPollEntry ? latestPollEntry.option1 : 0,
+//     op2: latestPollEntry ? latestPollEntry.option2 : 0,
+//     op3: latestPollEntry ? latestPollEntry.option3 : 0,
+//     op4: latestPollEntry ? latestPollEntry.option4 : 0,
+//     op5: latestPollEntry ? latestPollEntry.option5 : 0,
+    
+//   });   
 app.listen(3000);

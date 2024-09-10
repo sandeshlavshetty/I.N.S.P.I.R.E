@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bus Poll Admin pannel</title>
+  <title>Bus Poll Admin Panel</title>
   <link rel="stylesheet" href="/stylesheets/admin_style.css">
 </head>
+
 <body>
 
   <div class="header">
     D.I.A.P.E.R
   </div>
-  <a href="/logout">
-  <div class="logout" >
-    Logout
-  </div></a>
 
-  
-    
-      <div class="poll-container">
-        <form action="/create_poll" method="post">
-        <input type="text" name="p_describe" placeholder="Poll description">
-        <input type="text" name="option1_name" placeholder="Option 1">
-        <input type="text" name="option2_name" placeholder="Option 2">
-        <input type="text" name="option3_name" placeholder="Option 3">
-        <input type="text" name="option4_name" placeholder="Option 4">
-        <input type="text" name="option5_name" placeholder="Option 5">
-        <input class="button" type="submit" value="Create Poll">
-      </form>
-      </div>
-    
-  
+  <!-- Logout Button -->
+  <a href="/logout">
+    <div class="logout">Logout</div>
+  </a>
+
+  <!-- Poll Creation Form -->
+  <div class="poll-container">
+    <form action="/create_poll" method="post">
+      <input type="text" name="p_describe" placeholder="Poll description" required>
+      <input type="text" name="option1_name" placeholder="Option 1" required>
+      <input type="text" name="option2_name" placeholder="Option 2" required>
+      <input type="text" name="option3_name" placeholder="Option 3">
+      <input type="text" name="option4_name" placeholder="Option 4">
+      <input type="text" name="option5_name" placeholder="Option 5">
+      <input class="button" type="submit" value="Create Poll">
+    </form>
+  </div>
+
+  <!-- Stop Poll Button -->
   <div class="button-container">
     <a href="/stop_poll">
-  <div class="button" >Stop Poll</div></div></a>
-    
+      <div class="button">Stop Poll</div>
+    </a>
+  </div>
 
+  <!-- User Table -->
   <div class="container">
-    
     <div class="table-container">
       <!-- Table Header -->
       <div class="row">
@@ -47,18 +50,26 @@
         <div class="column">Approve</div>
         <div class="column">Delete</div>
       </div>
-      
-      <!-- Table Rows -->
-      <% user.forEach((userInfo) => { %>
-      <div class="row">
-        <div class="column"><%= userInfo.btid %></div>
-        <div class="column"><%= userInfo.name %></div>
-        <div class="column"><%= userInfo.email %></div>
-        <div class="column"><button href="#">Approve</button></div>
-        <div class="column"><button href="#">Delete</button></div>
-      </div>
-      <% }); %>
+
+      <!-- Table Rows - Loop through users -->
+      <% user.forEach((userInfo)=> { %>
+        <div class="row">
+          <div class="column">
+            <%= userInfo.btid %>
+          </div>
+          <div class="column">
+            <%= userInfo.name %>
+          </div>
+          <div class="column">
+            <%= userInfo.email %>
+          </div>
+          <div class="column"><button>Approve</button></div>
+          <div class="column"><button>Delete</button></div>
+        </div>
+        <% }); %>
     </div>
   </div>
+
 </body>
+
 </html>

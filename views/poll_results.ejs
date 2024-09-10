@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poll Results</title>
+  <link rel="stylesheet" href="/stylesheets/result_style.css">
+</head>
+<body>
+  <div class="header">
+    D.I.A.P.E.R Poll Results
+  </div>
+
+  <div class="results-container">
+    <h3>Poll Results</h3>
+    <ul>
+      <% if (poll_result) { %>
+        <li><strong><%= op1_n %>:</strong> <%= op1 %> votes</li>
+        <li><strong><%= op2_n %>:</strong> <%= op2 %> votes</li>
+        <% if (op3_n) { %><li><strong><%= op3_n %>:</strong> <%= op3 %> votes</li><% } %>
+        <% if (op4_n) { %><li><strong><%= op4_n %>:</strong> <%= op4 %> votes</li><% } %>
+        <% if (op5_n) { %><li><strong><%= op5_n %>:</strong> <%= op5 %> votes</li><% } %>
+      <% } else { %>
+        <li>No poll results available yet.</li>
+      <% } %>
+    </ul>
+  </div>
+
+  <!-- Back to Admin Panel -->
+  <div class="button-container">
+    <a href="/admin">
+      <div class="button">Back to Admin Panel</div>
+    </a>
+  </div>
+</body>
+</html>
