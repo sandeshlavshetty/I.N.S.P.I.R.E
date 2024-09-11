@@ -15,8 +15,8 @@ app.use(cookieParser());
 require('dotenv').config();
 const port = process.env.PORT || 3000;
 //middlewares
-app.use(express.json());
-app.use(cors());
+// app.use(express.json());
+// app.use(cors());
 
 app.get("/", (req, res) => {
     res.render("index");
