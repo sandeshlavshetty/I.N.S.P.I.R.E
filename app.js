@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
 function isLoggedIn(req, res, next) {
     if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.redirect("/login");
     else {
-        let data = jwt.verify(req.cookies.token, "shhhh");
+        let data = jwt.verify(req.cookies.token, process.env.JWT_KEY);
         req.user = data;
         next();
     }
@@ -40,7 +40,7 @@ app.post('/login', async (req, res) => {
 
     bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
-            let token = jwt.sign({ email: email, userid: user._id }, "shhhh");
+            let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_KEY);
             res.cookie("token", token);
             if (user.role == "admin") {
                 res.status(200).redirect("/admin");
@@ -78,7 +78,7 @@ app.post('/register', async (req, res) => {
                 role: "student",
                 approval: 0
             });
-            let token = jwt.sign({ email: email, userid: user._id }, "shhhh");
+            let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_KEY);
             res.cookie("token", token);
             res.status(200).redirect("/poll");
         })
