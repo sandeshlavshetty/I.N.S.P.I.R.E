@@ -18,6 +18,11 @@ const port = process.env.PORT || 3000;
 // app.use(express.json());
 // app.use(cors());
 
+app.set('views', path.join(__dirname, 'views'));
+
+
+
+
 app.get("/", (req, res) => {
     res.render("index");
 });
