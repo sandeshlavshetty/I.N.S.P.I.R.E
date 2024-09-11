@@ -22,42 +22,55 @@
 
         <!-- Main Poll Content -->
         <main>
-            <% if(valid==1) { %>
-                <% if(latestPollEntry.visibility == "1") { %>
-                    <div class="poll-form">
-                        <div class="poll-about">
-                            <h2><%= latestPollEntry.p_describe %></h2>
-                            <p>Select your preferred option for the next bus schedule:</p>
+            <% if(no_post==0) { %>
+                <% if(valid==1) { %>
+                    <% if(latestPollEntry.visibility=="1" ) { %>
+                        <div class="poll-form">
+                            <div class="poll-about">
+                                <h2>
+                                    <%= latestPollEntry.p_describe %>
+                                </h2>
+                                <p>Select your preferred option for the next bus schedule:</p>
+                            </div>
+                            <form id="pollForm" action="/poll" method="post">
+                                <label>
+                                    <input type="radio" name="pollOption" value="option1">
+                                    <%= latestPollEntry.option1_name %>
+                                </label>
+                                <label>
+                                    <input type="radio" name="pollOption" value="option2">
+                                    <%= latestPollEntry.option2_name %>
+                                </label>
+                                <label>
+                                    <input type="radio" name="pollOption" value="option3">
+                                    <%= latestPollEntry.option3_name %>
+                                </label>
+                                <label>
+                                    <input type="radio" name="pollOption" value="option4">
+                                    <%= latestPollEntry.option4_name %>
+                                </label>
+                                <label>
+                                    <input type="radio" name="pollOption" value="option5">
+                                    <%= latestPollEntry.option5_name %>
+                                </label>
+                                <button type="submit">Submit</button>
+                            </form>
                         </div>
-                        <form id="pollForm" action="/poll" method="post">
-                            <label>
-                                <input type="radio" name="pollOption" value="option1"> <%= latestPollEntry.option1_name %>
-                            </label>
-                            <label>
-                                <input type="radio" name="pollOption" value="option2"> <%= latestPollEntry.option2_name %>
-                            </label>
-                            <label>
-                                <input type="radio" name="pollOption" value="option3"> <%= latestPollEntry.option3_name %>
-                            </label>
-                            <label>
-                                <input type="radio" name="pollOption" value="option4"> <%= latestPollEntry.option4_name %>
-                            </label>
-                            <label>
-                                <input type="radio" name="pollOption" value="option5"> <%= latestPollEntry.option5_name %>
-                            </label>
-                            <button type="submit">Submit</button>
-                        </form>
-                    </div>
-                <% } else { %>
-                    <div>
-                        <h1>Poll has been closed or not yet created</h1>
-                    </div>
-                <% } %>
+                        <% } else { %>
+                            <div>
+                                <h1>Poll has been closed or not yet created</h1>
+                            </div>
+                            <% } %>
+                                <% } else { %>
+                                    <div>
+                                        <h1>Wait for Admin approval to use services....</h1>
+                                    </div>
+                                    <% } %>
             <% } else { %>
                 <div>
-                    <h1>Wait for Admin approval to use services....</h1>
+                    <h1>Poll has been not yet created</h1>
                 </div>
-            <% } %>
+                <% } %>
         </main>
     </div>
 </body>

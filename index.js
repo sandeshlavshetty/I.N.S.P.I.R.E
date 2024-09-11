@@ -106,14 +106,14 @@ app.get('/poll', isLoggedIn, async (req, res) => {
     if (latestPollEntry) {
         let user = await userModel.findOne({ email: req.user.email });
         if (user.approval == 1) {
-            res.status(200).render("poll", { latestPollEntry, valid: 1 });
+            res.status(200).render("poll", { latestPollEntry, valid: 1,no_post:0 });
         }
         else {
-            res.status(200).render("poll", { valid: 0 });
+            res.status(200).render("poll", { valid: 0,no_post:0 });
         }
     }
     else {
-        return res.status(500).send("Something went wrong");
+        res.status(200).render("poll", { no_post:1 });
     }
 });
 
