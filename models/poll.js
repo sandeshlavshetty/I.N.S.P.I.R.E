@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-mongoose.connect("mongodb+srv://admin:mongoDB@users.cfn02.mongodb.net/");
+mongoose.connect(process.env.MONGO_URL);
 
 const voteSchema = mongoose.Schema({
     p_describe : String,
