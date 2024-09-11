@@ -1,48 +1,52 @@
-body {
-    font-family: Arial, sans-serif;
+/* General Reset */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #f0f0f0;
 }
 
-.header {
-    background-color: #4CAF50;
+body {
+    font-family: 'Montserrat', sans-serif;
+    color: #333;
+    background-color: #f9f9f9;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+header {
+    background-color: #333;
     color: white;
-    padding: 10px;
-    text-align: center;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 24px;
-    font-weight: bold;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.logout {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 10px;
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+header .logo {
+    font-size: 28px;
+    font-weight: 600;
 }
 
-.logout:hover {
-    background-color: #ff1a1a;
-}
-
+/* Results Section */
 .results-container {
-    padding: 20px;
+    padding: 40px 20px;
     background-color: white;
-    border-radius: 10px;
     margin: 20px;
+    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 h3 {
-    font-size: 22px;
-    margin-bottom: 10px;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
 }
 
 ul {
@@ -52,12 +56,15 @@ ul {
 
 ul li {
     padding: 10px;
-    background-color: #f9f9f9;
+    background-color: #f4f4f4;
     margin: 5px 0;
     border-radius: 5px;
+    font-size: 18px;
+    color: #555;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Button Container */
 .button-container {
     display: flex;
     justify-content: center;
@@ -65,18 +72,18 @@ ul li {
 }
 
 .button {
-    background-color: #4CAF50;
+    background-color: #28a745;
     color: white;
     padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+    border-radius: 25px;
+    font-weight: 600;
     text-align: center;
-    cursor: pointer;
     transition: background-color 0.3s ease;
+    cursor: pointer;
 }
 
 .button:hover {
-    background-color: #45a049;
+    background-color: #218838;
 }
 
 a {
@@ -84,48 +91,32 @@ a {
     color: white;
 }
 
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-
-    .header {
+    header {
         font-size: 20px;
-        padding: 8px;
     }
 
     .results-container {
-        padding: 15px;
+        padding: 30px 15px;
         margin: 10px;
     }
 
     h3 {
-        font-size: 18px;
+        font-size: 22px;
     }
 
     ul li {
-        padding: 8px;
-    }
-
-    .button-container {
-        margin: 10px;
+        font-size: 16px;
     }
 
     .button {
         padding: 8px 15px;
-        font-size: 14px;
-    }
-
-    .logout {
-        top: 10px;
-        right: 10px;
-        padding: 8px;
-        font-size: 14px;
     }
 }
 
 @media (max-width: 480px) {
-    .header {
+    header {
         font-size: 18px;
     }
 
@@ -135,13 +126,6 @@ a {
 
     .button {
         padding: 5px 10px;
-        font-size: 12px;
-    }
-
-    .logout {
-        top: 5px;
-        right: 5px;
-        padding: 5px;
-        font-size: 12px;
+        font-size: 14px;
     }
 }
