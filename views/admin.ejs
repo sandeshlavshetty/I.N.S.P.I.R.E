@@ -10,17 +10,14 @@
 
 <body>
 
-  <div class="header">
-    I.N.S.P.I.R.E
-  </div>
-
-  <!-- Logout Button -->
-  <a href="/logout">
-    <div class="logout">Logout</div>
-  </a>
+  <header class="header">
+    <div class="logo">I.N.S.P.I.R.E</div>
+    <a href="/logout" class="logout">Logout</a>
+  </header>
 
   <!-- Poll Creation Form -->
-  <div class="poll-container">
+  <section class="poll-container">
+    <h2>Create Poll</h2>
     <form action="/create_poll" method="post">
       <input type="text" name="p_describe" placeholder="Poll description" required>
       <input type="text" name="option1_name" placeholder="Option 1" required>
@@ -28,47 +25,36 @@
       <input type="text" name="option3_name" placeholder="Option 3">
       <input type="text" name="option4_name" placeholder="Option 4">
       <input type="text" name="option5_name" placeholder="Option 5">
-      <input class="button" type="submit" value="Create Poll">
+      <input class="button create-button" type="submit" value="Create Poll">
     </form>
-  </div>
+  </section>
 
   <!-- Stop Poll Button -->
-  <div class="button-container">
-    <a href="/stop_poll">
-      <div class="button">Stop Poll</div>
-    </a>
-  </div>
+  <section class="button-container">
+    <a href="/stop_poll" class="button stop-button">Stop Poll</a>
+  </section>
 
   <!-- User Table -->
-  <div class="container">
-    <div class="table-container">
-      <!-- Table Header -->
-      <div class="row">
-        <div class="column">BT id</div>
-        <div class="column">Name</div>
-        <div class="column">Email</div>
-        <div class="column">Approve</div>
-        <div class="column">Delete</div>
-      </div>
-
-      <!-- Table Rows - Loop through users -->
-      <% user.forEach((userInfo)=> { %>
-        <div class="row">
-          <div class="column">
-            <%= userInfo.btid %>
-          </div>
-          <div class="column">
-            <%= userInfo.name %>
-          </div>
-          <div class="column">
-            <%= userInfo.email %>
-          </div>
-          <div class="column"><button>Approve</button></div>
-          <div class="column"><button>Delete</button></div>
-        </div>
-        <% }); %>
+  <section class="table-container">
+    <div class="table-header">
+      <div class="table-header-cell">BT id</div>
+      <div class="table-header-cell">Name</div>
+      <div class="table-header-cell">Email</div>
+      <div class="table-header-cell">Approve</div>
+      <div class="table-header-cell">Delete</div>
     </div>
-  </div>
+
+    <!-- Table Rows - Loop through users -->
+    <% user.forEach((userInfo)=> { %>
+      <div class="table-row">
+        <div class="table-cell"><%= userInfo.btid %></div>
+        <div class="table-cell"><%= userInfo.name %></div>
+        <div class="table-cell"><%= userInfo.email %></div>
+        <div class="table-cell"><button class="approve-button">Approve</button></div>
+        <div class="table-cell"><button class="delete-button">Delete</button></div>
+      </div>
+    <% }); %>
+  </section>
 
 </body>
 
