@@ -20,14 +20,7 @@ const port = process.env.PORT || 3000;
 
 app.set('views', path.join(__dirname, 'views'));
 
-//insightso_of_speed
-import { injectSpeedInsights } from '@vercel/speed-insights';
- 
-injectSpeedInsights();
-//insights of web view
-import { inject } from '@vercel/analytics';
- 
-inject();
+
 
 
 app.get("/", (req, res) => {
