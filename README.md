@@ -1,4 +1,4 @@
-Here’s the complete markdown-formatted `README.md` file for your project:
+
 
 # I.N.S.P.I.R.E. Bus Poll System
 
@@ -106,6 +106,3 @@ We welcome contributions from the community! Here’s how you can get involved:
 ## License
 
 This project is licensed under the [MIT License](LICENSE). You’re free to use, modify, and distribute this project under the terms of this license.
-```
-
-This markdown file is formatted to be copy-paste ready for your `README.md` file. Let me know if you need further adjustments!
