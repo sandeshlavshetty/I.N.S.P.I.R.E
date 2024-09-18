@@ -1,6 +1,5 @@
 Here’s the complete markdown-formatted `README.md` file for your project:
 
-```markdown
 # I.N.S.P.I.R.E. Bus Poll System
 
 ## Project Overview
@@ -27,7 +26,6 @@ Before running the project locally, ensure you have the following installed:
    ```bash
    git clone https://github.com/your-username/INSPIRE-Bus-Poll.git
    cd INSPIRE-Bus-Poll
-   ```
 
 2. **Install dependencies**:  
    Navigate to the project directory and install the required Node.js packages:
