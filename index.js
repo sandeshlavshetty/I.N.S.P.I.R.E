@@ -123,7 +123,9 @@ app.post("/poll", isLoggedIn, async (req, res) => {
     const documentIdToUpdate = latestPollEntry._id;
     console.log("poll log");
     const now = new Date();
-    storedDateTime = now.toLocaleString();
+    storedDateTime = now.toLocaleDateString();
+    user_email=req.user.email;
+    
     if (selectedOptionValue == "option1") {
         try {
             const result = await pollModel.updateOne(
@@ -137,9 +139,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                 console.log('No documents matched the query. Document not updated.');
             }
             const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+            const user = await userModel.findOne({ email:user_email });
             res.status(200).render('ticket', {
                 option: latestPollEntry.option1_name,
-                time: storedDateTime
+                time: storedDateTime,
+                btid:user.btid
             });
         } catch (err) {
             console.error('Error updating document:', err);
@@ -159,9 +163,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                 console.log('No documents matched the query. Document not updated.');
             }
             const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+            const user = await userModel.findOne({ email:user_email });
             res.status(200).render('ticket', {
                 option: latestPollEntry.option2_name,
-                time: storedDateTime
+                time: storedDateTime,
+                btid:user.btid
             });
         } catch (err) {
             console.error('Error updating document:', err);
@@ -181,9 +187,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                 console.log('No documents matched the query. Document not updated.');
             }
             const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+            const user = await userModel.findOne({ email:user_email });
             res.status(200).render('ticket', {
                 option: latestPollEntry.option3_name,
-                time: storedDateTime
+                time: storedDateTime,
+                btid:user.btid
             });
         } catch (err) {
             console.error('Error updating document:', err);
@@ -203,9 +211,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                 console.log('No documents matched the query. Document not updated.');
             }
             const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+            const user = await userModel.findOne({ email:user_email });
             res.status(200).render('ticket', {
                 option: latestPollEntry.option4_name,
-                time: storedDateTime
+                time: storedDateTime,
+                btid:user.btid
             });
         } catch (err) {
             console.error('Error updating document:', err);
@@ -225,9 +235,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                 console.log('No documents matched the query. Document not updated.');
             }
             const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+            const user = await userModel.findOne({ email:user_email });
             res.status(200).render('ticket', {
                 option: latestPollEntry.option5_name,
-                time: storedDateTime
+                time: storedDateTime,
+                btid:user.btid
             });
         } catch (err) {
             console.error('Error updating document:', err);
