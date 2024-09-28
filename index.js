@@ -126,7 +126,7 @@ app.get('/poll', isLoggedIn, async (req, res) => {
     }
     else if(!latestPollEntry){
         let user = await userModel.findOne({ email: req.user.email });
-        if (user.chosen_option == "") {
+        if (user.chosen_option != "") {
             res.status(200).redirect("/poll_token");
             // console.log("first time vote");
         }
