@@ -110,18 +110,28 @@ app.get('/poll', isLoggedIn, async (req, res) => {
     if (latestPollEntry) {
         let user = await userModel.findOne({ email: req.user.email });
         if (user.approval == 1) {
-            console.log(user.chosen_option);
+            // console.log(user.chosen_option);
             if (user.chosen_option == "") {
                 res.status(200).render("poll", { latestPollEntry, valid: 1, no_post: 0 });
-                console.log("first time vote");
+                // console.log("first time vote");
             }
             else {
                 res.status(200).redirect("/poll_token");
-                console.log("token visit vote");
+                // console.log("token visit vote");
             }
         }
         else {
             res.status(200).render("poll", { valid: 0, no_post: 0 });
+        }
+    }
+    else if(!latestPollEntry){
+        let user = await userModel.findOne({ email: req.user.email });
+        if (user.chosen_option == "") {
+            res.status(200).redirect("/poll_token");
+            // console.log("first time vote");
+        }
+        else{
+            res.status(200).render("poll", { no_post: 1 });
         }
     }
     else {
