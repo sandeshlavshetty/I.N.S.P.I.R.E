@@ -9,7 +9,9 @@ const userSchema = mongoose.Schema({
     email: String,
     password: String,
     role : String,
-    approval : Number
+    approval : Number,
+    chosen_option: { type: String, default: "default_value" },  // Added field
+    d_optn: { type: String, default: "default" }                 // Added field
 });
 
 module.exports = mongoose.model('user', userSchema);

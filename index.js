@@ -96,8 +96,12 @@ app.post('/register', async (req, res) => {
 
 app.get('/admin', isLoggedIn, async (req, res) => {
     const users = await userModel.find();
-   
-    res.render('admin', { user: users});
+    let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
+    if(latestPollEntry){
+    res.render('admin', { user: users, poll_result:latestPollEntry });}
+    else{
+        res.render('admin', { user: users, poll_result:"" });
+    }
 });
 
 app.get('/poll', isLoggedIn, async (req, res) => {
@@ -106,150 +110,226 @@ app.get('/poll', isLoggedIn, async (req, res) => {
     if (latestPollEntry) {
         let user = await userModel.findOne({ email: req.user.email });
         if (user.approval == 1) {
-            res.status(200).render("poll", { latestPollEntry, valid: 1,no_post:0 });
+            console.log(user.chosen_option);
+            if (user.chosen_option == "") {
+                res.status(200).render("poll", { latestPollEntry, valid: 1, no_post: 0 });
+                console.log("first time vote");
+            }
+            else {
+                res.status(200).redirect("/poll_token");
+                console.log("token visit vote");
+            }
         }
         else {
-            res.status(200).render("poll", { valid: 0,no_post:0 });
+            res.status(200).render("poll", { valid: 0, no_post: 0 });
         }
     }
     else {
-        res.status(200).render("poll", { no_post:1 });
+        res.status(200).render("poll", { no_post: 1 });
     }
+});
+
+app.get("/poll_token", isLoggedIn, async (req, res) => {
+    let user = await userModel.findOne({ email: req.user.email });
+    res.status(200).render('ticket', {
+        option: user.chosen_option,
+        time: user.d_optn,
+        btid: user.btid
+    });
 });
 
 app.post("/poll", isLoggedIn, async (req, res) => {
     const selectedOptionValue = req.body.pollOption;
     let latestPollEntry = await pollModel.findOne({ visibility: "1" });
-    const documentIdToUpdate = latestPollEntry._id;
-    console.log("poll log");
-    const now = new Date();
-    storedDateTime = now.toLocaleDateString();
-    user_email=req.user.email;
-    
-    if (selectedOptionValue == "option1") {
-        try {
-            const result = await pollModel.updateOne(
-                { _id: documentIdToUpdate },
-                { $inc: { option1: 1 } }
-            ).exec();
+    if (latestPollEntry) {
+        const documentIdToUpdate = latestPollEntry._id;
+        console.log("poll log");
+        const now = new Date();
+        storedDateTime = now.toLocaleDateString();
+        user_email = req.user.email;
 
-            if (result) {
-                console.log('Document updated successfully:');
-            } else {
-                console.log('No documents matched the query. Document not updated.');
+        if (selectedOptionValue == "option1") {
+            try {
+                const result = await pollModel.updateOne(
+                    { _id: documentIdToUpdate },
+                    { $inc: { option1: 1 } }
+                ).exec();
+
+                if (result) {
+                    console.log('Document updated successfully:');
+                } else {
+                    console.log('No documents matched the query. Document not updated.');
+                }
+                const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+                const user = await userModel.findOne({ email: user_email });
+                // Update the user's chosen option and date option fields
+                const userResult = await userModel.updateOne(
+                    { email: user_email },
+                    {
+                        $set: {
+                            chosen_option: latestPollEntry.option1_name,
+                            d_optn: storedDateTime
+                        }
+                    }
+                ).exec();
+
+                res.status(200).render('ticket', {
+                    option: latestPollEntry.option1_name,
+                    time: storedDateTime,
+                    btid: user.btid
+                });
+            } catch (err) {
+                console.error('Error updating document:', err);
+                res.status(500).send('Error updating poll.');
             }
-            const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
-            const user = await userModel.findOne({ email:user_email });
-            res.status(200).render('ticket', {
-                option: latestPollEntry.option1_name,
-                time: storedDateTime,
-                btid:user.btid
-            });
-        } catch (err) {
-            console.error('Error updating document:', err);
-            res.status(500).send('Error updating poll.');
         }
-    }
-    else if (selectedOptionValue == "option2") {
-        try {
-            const result = await pollModel.updateOne(
-                { _id: documentIdToUpdate },
-                { $inc: { option2: 1 } }
-            ).exec();
+        else if (selectedOptionValue == "option2") {
+            try {
+                const result = await pollModel.updateOne(
+                    { _id: documentIdToUpdate },
+                    { $inc: { option2: 1 } }
+                ).exec();
 
-            if (result) {
-                console.log('Document updated successfully:');
-            } else {
-                console.log('No documents matched the query. Document not updated.');
+                if (result) {
+                    console.log('Document updated successfully:');
+                } else {
+                    console.log('No documents matched the query. Document not updated.');
+                }
+                const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+                const user = await userModel.findOne({ email: user_email });
+                // Update the user's chosen option and date option fields
+                const userResult = await userModel.updateOne(
+                    { email: user_email },
+                    {
+                        $set: {
+                            chosen_option: latestPollEntry.option2_name,
+                            d_optn: storedDateTime
+                        }
+                    }
+                ).exec();
+                res.status(200).render('ticket', {
+                    option: latestPollEntry.option2_name,
+                    time: storedDateTime,
+                    btid: user.btid
+                });
+            } catch (err) {
+                console.error('Error updating document:', err);
+                res.status(500).send('Error updating poll.');
             }
-            const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
-            const user = await userModel.findOne({ email:user_email });
-            res.status(200).render('ticket', {
-                option: latestPollEntry.option2_name,
-                time: storedDateTime,
-                btid:user.btid
-            });
-        } catch (err) {
-            console.error('Error updating document:', err);
-            res.status(500).send('Error updating poll.');
         }
-    }
-    else if (selectedOptionValue == "option3") {
-        try {
-            const result = await pollModel.updateOne(
-                { _id: documentIdToUpdate },
-                { $inc: { option3: 1 } }
-            ).exec();
+        else if (selectedOptionValue == "option3") {
+            try {
+                const result = await pollModel.updateOne(
+                    { _id: documentIdToUpdate },
+                    { $inc: { option3: 1 } }
+                ).exec();
 
-            if (result) {
-                console.log('Document updated successfully:');
-            } else {
-                console.log('No documents matched the query. Document not updated.');
+                if (result) {
+                    console.log('Document updated successfully:');
+                } else {
+                    console.log('No documents matched the query. Document not updated.');
+                }
+                const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+                const user = await userModel.findOne({ email: user_email });
+                // Update the user's chosen option and date option fields
+                const userResult = await userModel.updateOne(
+                    { email: user_email },
+                    {
+                        $set: {
+                            chosen_option: latestPollEntry.option3_name,
+                            d_optn: storedDateTime
+                        }
+                    }
+                ).exec();
+
+                res.status(200).render('ticket', {
+                    option: latestPollEntry.option3_name,
+                    time: storedDateTime,
+                    btid: user.btid
+                });
+            } catch (err) {
+                console.error('Error updating document:', err);
+                res.status(500).send('Error updating poll.');
             }
-            const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
-            const user = await userModel.findOne({ email:user_email });
-            res.status(200).render('ticket', {
-                option: latestPollEntry.option3_name,
-                time: storedDateTime,
-                btid:user.btid
-            });
-        } catch (err) {
-            console.error('Error updating document:', err);
-            res.status(500).send('Error updating poll.');
         }
-    }
-    else if (selectedOptionValue == "option4") {
-        try {
-            const result = await pollModel.updateOne(
-                { _id: documentIdToUpdate },
-                { $inc: { option4: 1 } }
-            ).exec();
+        else if (selectedOptionValue == "option4") {
+            try {
+                const result = await pollModel.updateOne(
+                    { _id: documentIdToUpdate },
+                    { $inc: { option4: 1 } }
+                ).exec();
 
-            if (result) {
-                console.log('Document updated successfully:');
-            } else {
-                console.log('No documents matched the query. Document not updated.');
+                if (result) {
+                    console.log('Document updated successfully:');
+                } else {
+                    console.log('No documents matched the query. Document not updated.');
+                }
+                const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+                const user = await userModel.findOne({ email: user_email });
+                // Update the user's chosen option and date option fields
+                const userResult = await userModel.updateOne(
+                    { email: user_email },
+                    {
+                        $set: {
+                            chosen_option: latestPollEntry.option4_name,
+                            d_optn: storedDateTime
+                        }
+                    }
+                ).exec();
+
+                res.status(200).render('ticket', {
+                    option: latestPollEntry.option4_name,
+                    time: storedDateTime,
+                    btid: user.btid
+                });
+            } catch (err) {
+                console.error('Error updating document:', err);
+                res.status(500).send('Error updating poll.');
             }
-            const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
-            const user = await userModel.findOne({ email:user_email });
-            res.status(200).render('ticket', {
-                option: latestPollEntry.option4_name,
-                time: storedDateTime,
-                btid:user.btid
-            });
-        } catch (err) {
-            console.error('Error updating document:', err);
-            res.status(500).send('Error updating poll.');
         }
-    }
-    else if (selectedOptionValue == "option5") {
-        try {
-            const result = await pollModel.updateOne(
-                { _id: documentIdToUpdate },
-                { $inc: { option5: 1 } }
-            ).exec();
+        else if (selectedOptionValue == "option5") {
+            try {
+                const result = await pollModel.updateOne(
+                    { _id: documentIdToUpdate },
+                    { $inc: { option5: 1 } }
+                ).exec();
 
-            if (result) {
-                console.log('Document updated successfully:');
-            } else {
-                console.log('No documents matched the query. Document not updated.');
+                if (result) {
+                    console.log('Document updated successfully:');
+                } else {
+                    console.log('No documents matched the query. Document not updated.');
+                }
+                const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
+                const user = await userModel.findOne({ email: user_email });
+                // Update the user's chosen option and date option fields
+                const userResult = await userModel.updateOne(
+                    { email: user_email },
+                    {
+                        $set: {
+                            chosen_option: latestPollEntry.option5_name,
+                            d_optn: storedDateTime
+                        }
+                    }
+                ).exec();
+                res.status(200).render('ticket', {
+                    option: latestPollEntry.option5_name,
+                    time: storedDateTime,
+                    btid: user.btid
+                });
+            } catch (err) {
+                console.error('Error updating document:', err);
+                res.status(500).send('Error updating poll.');
             }
-            const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
-            const user = await userModel.findOne({ email:user_email });
-            res.status(200).render('ticket', {
-                option: latestPollEntry.option5_name,
-                time: storedDateTime,
-                btid:user.btid
-            });
-        } catch (err) {
-            console.error('Error updating document:', err);
-            res.status(500).send('Error updating poll.');
+        }
+        else {
+            console.error('Error updating document in poll submission:', err);
+            res.status(400).redirect('/poll');
         }
     }
     else {
-        console.error('Error updating document in poll submission:', err);
         res.status(400).redirect('/poll');
     }
+
 });
 
 app.post('/create_poll', isLoggedIn, async (req, res) => {
@@ -262,6 +342,25 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
         option1: 0, option2: 0, option3: 0, option4: 0, option5: 0
     });
     console.log('New poll created:', poll);
+
+    // Update all users' chosen_option and d_optn fields
+    try {
+        const updateResult = await userModel.updateMany(
+            {}, // Empty filter to match all documents
+            {
+                $set: {
+                    chosen_option: "",
+                    d_optn: ""
+                }
+            }
+        ).exec();
+
+        console.log(`${updateResult.matchedCount} user documents matched the filter, updated ${updateResult.modifiedCount} documents.`);
+    } catch (err) {
+        console.error('Error updating user documents:', err);
+    }
+
+
     res.status(200).redirect("/admin");
 });
 
@@ -279,7 +378,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
 //                 { _id: documentIdToUpdate },
 //                 { $set: { visibility: '0' } }
 //             ).exec();
-            
+
 //             if (result > 0) {
 //                 console.log('Document updated successfully:', result);
 //             } else {
@@ -290,7 +389,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
 //         }
 
 //         res.status(200).redirect('/admin');
-        
+
 //     } catch (err) {
 //         console.error('Error updating document:', err);
 //         res.status(500).send('Error stopping poll.');
@@ -310,7 +409,7 @@ app.get('/stop_poll', isLoggedIn, async (req, res) => {
                 { _id: documentIdToUpdate },
                 { $set: { visibility: '0' } }
             ).exec();
-            
+
             if (result.modifiedCount > 0) {
                 console.log('Document updated successfully:', result);
             } else {
@@ -354,11 +453,11 @@ app.get('/stop_poll', isLoggedIn, async (req, res) => {
 //     op3: latestPollEntry ? latestPollEntry.option3 : 0,
 //     op4: latestPollEntry ? latestPollEntry.option4 : 0,
 //     op5: latestPollEntry ? latestPollEntry.option5 : 0,
-    
+
 //   });  
 
 
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-  });
+});

@@ -14,7 +14,7 @@
     <div class="logo">I.N.S.P.I.R.E</div>
     <a href="/logout" class="logout">Logout</a>
   </header>
-
+  <% if(poll_result=="") { %>
   <!-- Poll Creation Form -->
   <section class="poll-container">
     <h2>Create Poll</h2>
@@ -28,6 +28,18 @@
       <input class="button create-button" type="submit" value="Create Poll">
     </form>
   </section>
+  <% } else { %>
+   <!-- Poll Result bar -->
+   <section class="poll-container">
+    <h2>Poll Analyists</h2>
+      <div>Poll Description :- <%= poll_result.p_describe%></div>
+      <div><%= poll_result.option1_name%> :- <%= poll_result.option1%></div>
+      <div><%= poll_result.option2_name%> :- <%= poll_result.option2%></div>
+      <div><%= poll_result.option3_name%> :- <%= poll_result.option3%></div>
+      <div><%= poll_result.option4_name%> :- <%= poll_result.option4%></div>
+      <div><%= poll_result.option5_name%> :- <%= poll_result.option5%></div>
+  </section>
+  <% } %>
 
   <!-- Stop Poll Button -->
   <section class="button-container">
