@@ -22,9 +22,11 @@ app.set('views', path.join(__dirname, 'views'));
 
 
 
-
 app.get("/", (req, res) => {
-    res.render("index");
+    if (req.cookies.token === "" || typeof req.cookies.token === 'undefined')  res.render("index");
+    else {
+        res.status(200).redirect("/poll");
+    }   
 });
 
 function isLoggedIn(req, res, next) {
@@ -448,25 +450,6 @@ app.get('/stop_poll', isLoggedIn, async (req, res) => {
         res.status(500).send('Error stopping poll.');
     }
 });
-
-
-
-// res.redirect("/admin", {
-//     poll_result: latestPollEntry ? 1 : 0,
-//     op1_n: latestPollEntry ? latestPollEntry.option1_name : null,
-//     op2_n: latestPollEntry ? latestPollEntry.option2_name : null,
-//     op3_n: latestPollEntry ? latestPollEntry.option3_name : null,
-//     op4_n: latestPollEntry ? latestPollEntry.option4_name : null,
-//     op5_n: latestPollEntry ? latestPollEntry.option5_name : null,
-//     op1: latestPollEntry ? latestPollEntry.option1 : 0,
-//     op2: latestPollEntry ? latestPollEntry.option2 : 0,
-//     op3: latestPollEntry ? latestPollEntry.option3 : 0,
-//     op4: latestPollEntry ? latestPollEntry.option4 : 0,
-//     op5: latestPollEntry ? latestPollEntry.option5 : 0,
-
-//   });  
-
-
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
