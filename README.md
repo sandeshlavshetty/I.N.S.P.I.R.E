@@ -26,6 +26,7 @@ Before running the project locally, ensure you have the following installed:
    ```bash
    git clone https://github.com/your-username/INSPIRE-Bus-Poll.git
    cd INSPIRE-Bus-Poll
+   ```
 
 2. **Install dependencies**:  
    Navigate to the project directory and install the required Node.js packages:
@@ -33,13 +34,22 @@ Before running the project locally, ensure you have the following installed:
    npm install
    ```
 
-3. **Run the project locally**:  
+3. **Create your enviornment variables**:
+   
+   Required environment variables:
+      - `MONGO_URL`: Connection string to establish connection to the MongoDB server.
+      - `JWT_KEY`: A secure key for jsonwebtoken. Can be created by running `openssl rand -base64 32` in the terminal.
+  
+   Create a `.env` file and store the values of the above mentioned environment variables.
+
+
+4. **Run the project locally**:  
    Start the development server:
    ```bash
    npm start
    ```
 
-4. **Access the application**:  
+5. **Access the application**:  
    Open your browser and visit:
    ```
    http://localhost:3000
