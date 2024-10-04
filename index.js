@@ -51,6 +51,8 @@ passport.use(new GoogleStrategy({
                 googleId: profile.id,
                 name: profile.displayName,
                 email: profile.emails[0].value
+                email: profile.emails[0].value,
+                provider: 'google'
             });
             console.log("New user.", newUser);
 
