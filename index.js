@@ -50,7 +50,6 @@ passport.use(new GoogleStrategy({
             let newUser = new userModel({
                 googleId: profile.id,
                 name: profile.displayName,
-                email: profile.emails[0].value
                 email: profile.emails[0].value,
                 provider: 'google'
             });
@@ -206,7 +205,7 @@ app.get('/admin', isLoggedIn, async (req, res) => {
     }
 });
 
-app.get('/poll', isLoggedIn, async (req, res) => {
+app.get('/poll', ensureAuthenticated, async (req, res) => {
     let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
 
     if (latestPollEntry) {
