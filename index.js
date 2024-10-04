@@ -98,6 +98,27 @@ app.get('/auth/google/callback',
     }
 );
 
+/**
+ * Middleware to ensure that a user is authenticated.
+ *
+ * This function checks if the user is authenticated. If the user is 
+ * authenticated, it allows the request to proceed to the next middleware 
+ * or route handler. If the user is not authenticated, they are redirected 
+ * to the login page.
+ *
+ * @param {Object} req - The request object containing user information and session data.
+ * @param {Object} res - The response object used to send responses to the client.
+ * @param {function} next - The next middleware function in the stack.
+ */
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        const { email, name } = req.user;
+        console.log(`${name} is authenticated!. Email : ${email}`);
+        return next();
+    }
+    res.redirect('/login');
+}
+
 app.get("/", (req, res) => {
     if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.render("index");
     else {
