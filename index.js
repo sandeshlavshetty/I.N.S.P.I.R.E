@@ -63,6 +63,27 @@ passport.use(new GoogleStrategy({
     }
 ));
 
+/**
+ * Serializes user information for session storage.
+ */
+passport.serializeUser((user, done) => {
+    console.log("User ID = ", user.id);
+    done(null, user.id);  // Store the user ID in the session
+});
+
+/**
+ * Deserializes user information from the session.
+ */
+passport.deserializeUser(async (id, done) => {
+    try {
+        let user = await userModel.findById(id);  // Find user by ID when deserializing
+        console.log("User deserialize.", user);
+        done(null, user);
+    } catch (err) {
+        done(err, false);
+    }
+});
+
 
 app.get("/", (req, res) => {
     if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.render("index");
