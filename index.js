@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+const passport = require('./config/passportConfig');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 const userModel = require("./models/user");
 const pollModel = require("./models/poll");
 const cookieParser = require('cookie-parser');
@@ -20,6 +23,12 @@ const port = process.env.PORT || 3000;
 
 app.set('views', path.join(__dirname, 'views'));
 
+// Session and Passport Middleware
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+/************************************** GOOGLE OAUTH **************************************/
+/* Passportjs Docs Refer : https://www.passportjs.org/packages/passport-google-oauth20 */
 
 
 app.get("/", (req, res) => {
