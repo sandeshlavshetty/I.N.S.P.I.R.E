@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema({
     email: String,
     password: String,
     role: { type: String, default: "student" },
-    approval: Number,
+    approval: { type: Number, default: 0 },
     chosen_option: { type: String, default: "" },
     d_optn: { type: String, default: "" },
     googleId: { type: String, default: null },
