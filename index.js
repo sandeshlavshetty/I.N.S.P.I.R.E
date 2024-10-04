@@ -27,15 +27,48 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+
 /************************************** GOOGLE OAUTH **************************************/
-/* Passportjs Docs Refer : https://www.passportjs.org/packages/passport-google-oauth20 */
+/* PassportJS Docs Refer : https://www.passportjs.org/packages/passport-google-oauth20 */
+
+// Setting up Google Stratergy for Passport.
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/auth/google/callback"
+},
+    // verify callback [https://www.passportjs.org/packages/passport-google-oauth20/]
+    async (accessToken, refreshToken, profile, done) => {
+        try {
+            let existingUser = await userModel.findOne({ googleId: profile.id });
+
+            if (existingUser) {
+                console.log("User already exists.", existingUser);
+                return done(null, existingUser);
+            }
+
+            let newUser = new userModel({
+                googleId: profile.id,
+                name: profile.displayName,
+                email: profile.emails[0].value
+            });
+            console.log("New user.", newUser);
+
+            await newUser.save();
+            console.log("Access Token: ", accessToken);
+            return done(null, newUser);
+        } catch (err) {
+            return done(err, false);
+        }
+    }
+));
 
 
 app.get("/", (req, res) => {
-    if (req.cookies.token === "" || typeof req.cookies.token === 'undefined')  res.render("index");
+    if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.render("index");
     else {
         res.status(200).redirect("/poll");
-    }   
+    }
 });
 
 function isLoggedIn(req, res, next) {
@@ -108,10 +141,11 @@ app.post('/register', async (req, res) => {
 app.get('/admin', isLoggedIn, async (req, res) => {
     const users = await userModel.find();
     let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
-    if(latestPollEntry){
-    res.render('admin', { user: users, poll_result:latestPollEntry });}
-    else{
-        res.render('admin', { user: users, poll_result:"" });
+    if (latestPollEntry) {
+        res.render('admin', { user: users, poll_result: latestPollEntry });
+    }
+    else {
+        res.render('admin', { user: users, poll_result: "" });
     }
 });
 
@@ -135,13 +169,13 @@ app.get('/poll', isLoggedIn, async (req, res) => {
             res.status(200).render("poll", { valid: 0, no_post: 0 });
         }
     }
-    else if(!latestPollEntry){
+    else if (!latestPollEntry) {
         let user = await userModel.findOne({ email: req.user.email });
         if (user.chosen_option != "") {
             res.status(200).redirect("/poll_token");
             // console.log("first time vote");
         }
-        else{
+        else {
             res.status(200).render("poll", { no_post: 1 });
         }
     }
