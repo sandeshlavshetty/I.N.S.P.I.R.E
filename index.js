@@ -127,15 +127,6 @@ app.get("/", (req, res) => {
     }
 });
 
-function isLoggedIn(req, res, next) {
-    if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.redirect("/login");
-    else {
-        let data = jwt.verify(req.cookies.token, process.env.JWT_KEY);
-        req.user = data;
-        next();
-    }
-}
-
 app.get('/login', (req, res) => {
     res.render('login');
 });
@@ -194,7 +185,7 @@ app.post('/register', async (req, res) => {
     })
 });
 
-app.get('/admin', isLoggedIn, async (req, res) => {
+app.get('/admin', ensureAuthenticated, async (req, res) => {
     const users = await userModel.find();
     let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
     if (latestPollEntry) {
@@ -240,7 +231,7 @@ app.get('/poll', ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.get("/poll_token", isLoggedIn, async (req, res) => {
+app.get("/poll_token", ensureAuthenticated, async (req, res) => {
     let user = await userModel.findOne({ email: req.user.email });
     res.status(200).render('ticket', {
         option: user.chosen_option,
@@ -249,7 +240,7 @@ app.get("/poll_token", isLoggedIn, async (req, res) => {
     });
 });
 
-app.post("/poll", isLoggedIn, async (req, res) => {
+app.post("/poll", ensureAuthenticated, async (req, res) => {
     const selectedOptionValue = req.body.pollOption;
     let latestPollEntry = await pollModel.findOne({ visibility: "1" });
     if (latestPollEntry) {
@@ -443,7 +434,7 @@ app.post("/poll", isLoggedIn, async (req, res) => {
 
 });
 
-app.post('/create_poll', isLoggedIn, async (req, res) => {
+app.post('/create_poll', ensureAuthenticated, async (req, res) => {
     console.log("/create_poll entered");
     let { p_describe, option1_name, option2_name, option3_name, option4_name, option5_name
     } = req.body;
@@ -476,7 +467,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
 });
 
 
-// app.get('/stop_poll', isLoggedIn, async (req, res) => {
+// app.get('/stop_poll', ensureAuthenticated, async (req, res) => {
 //     try {
 //         // Find the latest poll entry
 //         let latestPollEntry = await pollModel.findOne({ visibility: "1" });
@@ -507,7 +498,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
 //     }
 // });
 
-app.get('/stop_poll', isLoggedIn, async (req, res) => {
+app.get('/stop_poll', ensureAuthenticated, async (req, res) => {
     try {
         // Find the latest poll entry
         let latestPollEntry = await pollModel.findOne({ visibility: "1" });
