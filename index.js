@@ -84,6 +84,19 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
+// Google OAuth Routes
+app.get('/auth/google',
+    passport.authenticate('google', {
+        scope: ['profile', 'email',]
+    }));
+
+// Authentication callback
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/', failureMessage: true }),
+    (_req, res) => {
+        res.redirect('/poll');
+    }
+);
 
 app.get("/", (req, res) => {
     if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.render("index");
