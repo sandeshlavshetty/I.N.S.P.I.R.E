@@ -117,9 +117,12 @@ function ensureAuthenticated(req, res, next) {
         console.log(`${name} is authenticated!. Email : ${email}`);
         return next();
     } else if (!req.isAuthenticated()) {
-        let data = jwt.verify(req.cookies.token, process.env.JWT_KEY);
-        req.user = data;
-        return next();
+        if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.redirect('/login');
+        else {
+            let data = jwt.verify(req.cookies.token, process.env.JWT_KEY);
+            req.user = data;
+            return next();
+        }
     } else {
         res.redirect('/login');
     }
