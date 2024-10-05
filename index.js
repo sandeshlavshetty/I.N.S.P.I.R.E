@@ -153,9 +153,12 @@ app.post('/login', async (req, res) => {
     })
 });
 
-app.get('/logout', (req, res) => {
+app.get('/logout', (req, res, next) => {
     res.cookie("token", "");
-    res.render("index");
+    req.logout((err) => {
+        if (err) { return next(); }
+        res.redirect('/')
+    })
 });
 
 app.get('/register', (req, res) => {
