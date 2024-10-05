@@ -110,14 +110,19 @@ app.get('/auth/google/callback',
  * @param {Object} req - The request object containing user information and session data.
  * @param {Object} res - The response object used to send responses to the client.
  * @param {function} next - The next middleware function in the stack.
- */
+*/
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         const { email, name } = req.user;
         console.log(`${name} is authenticated!. Email : ${email}`);
         return next();
+    } else if (!req.isAuthenticated()) {
+        let data = jwt.verify(req.cookies.token, process.env.JWT_KEY);
+        req.user = data;
+        return next();
+    } else {
+        res.redirect('/login');
     }
-    res.redirect('/login');
 }
 
 app.get("/", (req, res) => {
