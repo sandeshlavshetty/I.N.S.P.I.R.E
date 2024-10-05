@@ -17,9 +17,12 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.20.0",
+    "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.1",
     "mongoose": "^8.6.1",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.4",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   }
 }

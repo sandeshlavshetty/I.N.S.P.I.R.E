@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+const passport = require('./config/passportConfig');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 const userModel = require("./models/user");
 const pollModel = require("./models/poll");
 const cookieParser = require('cookie-parser');
@@ -20,23 +23,117 @@ const port = process.env.PORT || 3000;
 
 app.set('views', path.join(__dirname, 'views'));
 
+// Session and Passport Middleware
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
+/************************************** GOOGLE OAUTH **************************************/
+/* PassportJS Docs Refer : https://www.passportjs.org/packages/passport-google-oauth20 */
 
-app.get("/", (req, res) => {
-    if (req.cookies.token === "" || typeof req.cookies.token === 'undefined')  res.render("index");
-    else {
-        res.status(200).redirect("/poll");
-    }   
+// Setting up Google Stratergy for Passport.
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/auth/google/callback"
+},
+    // verify callback [https://www.passportjs.org/packages/passport-google-oauth20/]
+    async (accessToken, refreshToken, profile, done) => {
+        try {
+            let existingUser = await userModel.findOne({ googleId: profile.id });
+
+            if (existingUser) {
+                console.log("User already exists.", existingUser);
+                return done(null, existingUser);
+            }
+
+            let newUser = new userModel({
+                googleId: profile.id,
+                name: profile.displayName,
+                email: profile.emails[0].value,
+                provider: 'google'
+            });
+            console.log("New user.", newUser);
+
+            await newUser.save();
+            console.log("Access Token: ", accessToken);
+            return done(null, newUser);
+        } catch (err) {
+            return done(err, false);
+        }
+    }
+));
+
+/**
+ * Serializes user information for session storage.
+ */
+passport.serializeUser((user, done) => {
+    console.log("User ID = ", user.id);
+    done(null, user.id);  // Store the user ID in the session
 });
 
-function isLoggedIn(req, res, next) {
-    if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.redirect("/login");
-    else {
-        let data = jwt.verify(req.cookies.token, process.env.JWT_KEY);
-        req.user = data;
-        next();
+/**
+ * Deserializes user information from the session.
+ */
+passport.deserializeUser(async (id, done) => {
+    try {
+        let user = await userModel.findById(id);  // Find user by ID when deserializing
+        console.log("User deserialize.", user);
+        done(null, user);
+    } catch (err) {
+        done(err, false);
+    }
+});
+
+// Google OAuth Routes
+app.get('/auth/google',
+    passport.authenticate('google', {
+        scope: ['profile', 'email',]
+    }));
+
+// Authentication callback
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/', failureMessage: true }),
+    (_req, res) => {
+        res.redirect('/poll');
+    }
+);
+
+/**
+ * Middleware to ensure that a user is authenticated.
+ *
+ * This function checks if the user is authenticated. If the user is 
+ * authenticated, it allows the request to proceed to the next middleware 
+ * or route handler. If the user is not authenticated, they are redirected 
+ * to the login page.
+ *
+ * @param {Object} req - The request object containing user information and session data.
+ * @param {Object} res - The response object used to send responses to the client.
+ * @param {function} next - The next middleware function in the stack.
+*/
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        const { email, name } = req.user;
+        console.log(`${name} is authenticated!. Email : ${email}`);
+        return next();
+    } else if (!req.isAuthenticated()) {
+        if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.redirect('/login');
+        else {
+            let data = jwt.verify(req.cookies.token, process.env.JWT_KEY);
+            req.user = data;
+            return next();
+        }
+    } else {
+        res.redirect('/login');
     }
 }
+
+app.get("/", (req, res) => {
+    if (req.cookies.token === "" || typeof req.cookies.token === 'undefined') res.render("index");
+    else {
+        res.status(200).redirect("/poll");
+    }
+});
 
 app.get('/login', (req, res) => {
     res.render('login');
@@ -64,9 +161,12 @@ app.post('/login', async (req, res) => {
     })
 });
 
-app.get('/logout', (req, res) => {
+app.get('/logout', (req, res, next) => {
     res.cookie("token", "");
-    res.render("index");
+    req.logout((err) => {
+        if (err) { return next(); }
+        res.redirect('/')
+    })
 });
 
 app.get('/register', (req, res) => {
@@ -96,17 +196,18 @@ app.post('/register', async (req, res) => {
     })
 });
 
-app.get('/admin', isLoggedIn, async (req, res) => {
+app.get('/admin', ensureAuthenticated, async (req, res) => {
     const users = await userModel.find();
     let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
-    if(latestPollEntry){
-    res.render('admin', { user: users, poll_result:latestPollEntry });}
-    else{
-        res.render('admin', { user: users, poll_result:"" });
+    if (latestPollEntry) {
+        res.render('admin', { user: users, poll_result: latestPollEntry });
+    }
+    else {
+        res.render('admin', { user: users, poll_result: "" });
     }
 });
 
-app.get('/poll', isLoggedIn, async (req, res) => {
+app.get('/poll', ensureAuthenticated, async (req, res) => {
     let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
 
     if (latestPollEntry) {
@@ -126,13 +227,13 @@ app.get('/poll', isLoggedIn, async (req, res) => {
             res.status(200).render("poll", { valid: 0, no_post: 0 });
         }
     }
-    else if(!latestPollEntry){
+    else if (!latestPollEntry) {
         let user = await userModel.findOne({ email: req.user.email });
         if (user.chosen_option != "") {
             res.status(200).redirect("/poll_token");
             // console.log("first time vote");
         }
-        else{
+        else {
             res.status(200).render("poll", { no_post: 1 });
         }
     }
@@ -141,7 +242,7 @@ app.get('/poll', isLoggedIn, async (req, res) => {
     }
 });
 
-app.get("/poll_token", isLoggedIn, async (req, res) => {
+app.get("/poll_token", ensureAuthenticated, async (req, res) => {
     let user = await userModel.findOne({ email: req.user.email });
     res.status(200).render('ticket', {
         option: user.chosen_option,
@@ -150,7 +251,7 @@ app.get("/poll_token", isLoggedIn, async (req, res) => {
     });
 });
 
-app.post("/poll", isLoggedIn, async (req, res) => {
+app.post("/poll", ensureAuthenticated, async (req, res) => {
     const selectedOptionValue = req.body.pollOption;
     let latestPollEntry = await pollModel.findOne({ visibility: "1" });
     if (latestPollEntry) {
@@ -344,7 +445,7 @@ app.post("/poll", isLoggedIn, async (req, res) => {
 
 });
 
-app.post('/create_poll', isLoggedIn, async (req, res) => {
+app.post('/create_poll', ensureAuthenticated, async (req, res) => {
     console.log("/create_poll entered");
     let { p_describe, option1_name, option2_name, option3_name, option4_name, option5_name
     } = req.body;
@@ -377,7 +478,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
 });
 
 
-// app.get('/stop_poll', isLoggedIn, async (req, res) => {
+// app.get('/stop_poll', ensureAuthenticated, async (req, res) => {
 //     try {
 //         // Find the latest poll entry
 //         let latestPollEntry = await pollModel.findOne({ visibility: "1" });
@@ -408,7 +509,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
 //     }
 // });
 
-app.get('/stop_poll', isLoggedIn, async (req, res) => {
+app.get('/stop_poll', ensureAuthenticated, async (req, res) => {
     try {
         // Find the latest poll entry
         let latestPollEntry = await pollModel.findOne({ visibility: "1" });
