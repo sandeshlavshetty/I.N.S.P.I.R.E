@@ -198,12 +198,16 @@ app.post('/register', async (req, res) => {
 
 app.get('/admin', ensureAuthenticated, async (req, res) => {
     const users = await userModel.find();
-    let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
-    if (latestPollEntry) {
-        res.render('admin', { user: users, poll_result: latestPollEntry });
-    }
-    else {
-        res.render('admin', { user: users, poll_result: "" });
+    if (req.user.role == "admin") {
+        let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
+        if (latestPollEntry) {
+            res.render('admin', { user: users, poll_result: latestPollEntry });
+        }
+        else {
+            res.render('admin', { user: users, poll_result: "" });
+        }
+    } else {
+        res.redirect('/');
     }
 });
 
