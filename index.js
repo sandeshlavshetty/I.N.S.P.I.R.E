@@ -44,8 +44,8 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
     let { email, password } = req.body;
-    console.log(email);
-    console.log(password);
+    // console.log(email);
+    // console.log(password);
     let user = await userModel.findOne({ email: email });
     if (!user) return res.status(500).send("Something went wrong");
 
@@ -97,7 +97,8 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/admin', isLoggedIn, async (req, res) => {
-    const users = await userModel.find();
+    // Find users with chosen_option equal to an empty string
+    const users = await userModel.find({ chosen_option: "" });
     if (req.user.role === "admin") {
         let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
         if (latestPollEntry) {
@@ -160,7 +161,7 @@ app.post("/poll", isLoggedIn, async (req, res) => {
     let latestPollEntry = await pollModel.findOne({ visibility: "1" });
     if (latestPollEntry) {
         const documentIdToUpdate = latestPollEntry._id;
-        console.log("poll log");
+        // console.log("poll log");
         const now = new Date();
         storedDateTime = now.toLocaleDateString();
         user_email = req.user.email;
@@ -172,11 +173,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                     { $inc: { option1: 1 } }
                 ).exec();
 
-                if (result) {
-                    console.log('Document updated successfully:');
-                } else {
-                    console.log('No documents matched the query. Document not updated.');
-                }
+                // if (result) {
+                //     console.log('Document updated successfully:');
+                // } else {
+                //     console.log('No documents matched the query. Document not updated.');
+                // }
                 const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
                 const user = await userModel.findOne({ email: user_email });
                 // Update the user's chosen option and date option fields
@@ -207,11 +208,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                     { $inc: { option2: 1 } }
                 ).exec();
 
-                if (result) {
-                    console.log('Document updated successfully:');
-                } else {
-                    console.log('No documents matched the query. Document not updated.');
-                }
+                // if (result) {
+                //     console.log('Document updated successfully:');
+                // } else {
+                //     console.log('No documents matched the query. Document not updated.');
+                // }
                 const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
                 const user = await userModel.findOne({ email: user_email });
                 // Update the user's chosen option and date option fields
@@ -241,11 +242,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                     { $inc: { option3: 1 } }
                 ).exec();
 
-                if (result) {
-                    console.log('Document updated successfully:');
-                } else {
-                    console.log('No documents matched the query. Document not updated.');
-                }
+                // if (result) {
+                //     console.log('Document updated successfully:');
+                // } else {
+                //     console.log('No documents matched the query. Document not updated.');
+                // }
                 const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
                 const user = await userModel.findOne({ email: user_email });
                 // Update the user's chosen option and date option fields
@@ -276,11 +277,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                     { $inc: { option4: 1 } }
                 ).exec();
 
-                if (result) {
-                    console.log('Document updated successfully:');
-                } else {
-                    console.log('No documents matched the query. Document not updated.');
-                }
+                // if (result) {
+                //     console.log('Document updated successfully:');
+                // } else {
+                //     console.log('No documents matched the query. Document not updated.');
+                // }
                 const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
                 const user = await userModel.findOne({ email: user_email });
                 // Update the user's chosen option and date option fields
@@ -311,11 +312,11 @@ app.post("/poll", isLoggedIn, async (req, res) => {
                     { $inc: { option5: 1 } }
                 ).exec();
 
-                if (result) {
-                    console.log('Document updated successfully:');
-                } else {
-                    console.log('No documents matched the query. Document not updated.');
-                }
+                // if (result) {
+                //     console.log('Document updated successfully:');
+                // } else {
+                //     console.log('No documents matched the query. Document not updated.');
+                // }
                 const latestPollEntry = await pollModel.findById(documentIdToUpdate).exec();
                 const user = await userModel.findOne({ email: user_email });
                 // Update the user's chosen option and date option fields
@@ -350,7 +351,7 @@ app.post("/poll", isLoggedIn, async (req, res) => {
 });
 
 app.post('/create_poll', isLoggedIn, async (req, res) => {
-    console.log("/create_poll entered");
+    // console.log("/create_poll entered");
     let { p_describe, option1_name, option2_name, option3_name, option4_name, option5_name
     } = req.body;
 
@@ -358,7 +359,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
         p_describe, visibility: 1, option1_name, option2_name, option3_name, option4_name, option5_name,
         option1: 0, option2: 0, option3: 0, option4: 0, option5: 0
     });
-    console.log('New poll created:', poll);
+    // console.log('New poll created:', poll);
 
     // Update all users' chosen_option and d_optn fields
     try {
@@ -372,7 +373,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
             }
         ).exec();
 
-        console.log(`${updateResult.matchedCount} user documents matched the filter, updated ${updateResult.modifiedCount} documents.`);
+        //console.log(`${updateResult.matchedCount} user documents matched the filter, updated ${updateResult.modifiedCount} documents.`);
     } catch (err) {
         console.error('Error updating user documents:', err);
     }
@@ -427,11 +428,11 @@ app.get('/stop_poll', isLoggedIn, async (req, res) => {
                 { $set: { visibility: '0' } }
             ).exec();
 
-            if (result.modifiedCount > 0) {
-                console.log('Document updated successfully:', result);
-            } else {
-                console.log('No documents matched the query. Document not updated.');
-            }
+            // if (result.modifiedCount > 0) {
+            //     console.log('Document updated successfully:', result);
+            // } else {
+            //     console.log('No documents matched the query. Document not updated.');
+            // }
         } else {
             console.log('No poll entries found.');
         }
