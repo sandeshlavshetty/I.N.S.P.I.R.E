@@ -359,7 +359,7 @@ app.post('/create_poll', isLoggedIn, async (req, res) => {
         p_describe, visibility: 1, option1_name, option2_name, option3_name, option4_name, option5_name,
         option1: 0, option2: 0, option3: 0, option4: 0, option5: 0
     });
-    // console.log('New poll created:', poll);
+    //console.log('New poll created:', poll);
 
     // Update all users' chosen_option and d_optn fields
     try {
@@ -422,11 +422,9 @@ app.get('/stop_poll', isLoggedIn, async (req, res) => {
         if (latestPollEntry) {
             const documentIdToUpdate = latestPollEntry._id;
 
-            // Update the visibility field
-            const result = await pollModel.updateOne(
-                { _id: documentIdToUpdate },
-                { $set: { visibility: '0' } }
-            ).exec();
+            // delete the object
+            const result = await pollModel.deleteOne({ _id: documentIdToUpdate }).exec();
+
 
             // if (result.modifiedCount > 0) {
             //     console.log('Document updated successfully:', result);
