@@ -146,6 +146,7 @@ app.post('/login', async (req, res) => {
     let user = await userModel.findOne({ email: email });
     if (!user) return res.status(500).send("Something went wrong");
 
+
     bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
             let token = jwt.sign({ email: user.email, userid: user._id, role: user.role }, process.env.JWT_KEY);
