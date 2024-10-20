@@ -146,9 +146,10 @@ app.post('/login', async (req, res) => {
     let user = await userModel.findOne({ email: email });
     if (!user) return res.status(500).send("Something went wrong");
 
+
     bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
-            let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_KEY);
+            let token = jwt.sign({ email: user.email, userid: user._id, role: user.role }, process.env.JWT_KEY);
             res.cookie("token", token);
             if (user.role == "admin") {
                 res.status(200).redirect("/admin");
@@ -189,7 +190,7 @@ app.post('/register', async (req, res) => {
                 role: "student",
                 approval: 0
             });
-            let token = jwt.sign({ email: email, userid: user._id }, process.env.JWT_KEY);
+            let token = jwt.sign({ email: user.email, userid: user._id, role: user.role }, process.env.JWT_KEY);
             res.cookie("token", token);
             res.status(200).redirect("/poll");
         })
@@ -198,12 +199,16 @@ app.post('/register', async (req, res) => {
 
 app.get('/admin', ensureAuthenticated, async (req, res) => {
     const users = await userModel.find();
-    let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
-    if (latestPollEntry) {
-        res.render('admin', { user: users, poll_result: latestPollEntry });
-    }
-    else {
-        res.render('admin', { user: users, poll_result: "" });
+    if (req.user.role == "admin") {
+        let latestPollEntry = await pollModel.findOne({ visibility: "1" }).exec();
+        if (latestPollEntry) {
+            res.render('admin', { user: users, poll_result: latestPollEntry });
+        }
+        else {
+            res.render('admin', { user: users, poll_result: "" });
+        }
+    } else {
+        res.redirect('/');
     }
 });
 
