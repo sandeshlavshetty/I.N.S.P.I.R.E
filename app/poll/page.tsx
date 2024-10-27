@@ -56,7 +56,7 @@ export default function Page() {
                     {/* First Row: Poll and Bus Timing */}
                     <div className="mx-auto w-full max-w-3xl flex flex-col md:flex-row gap-4">
                         {/* Poll Section */}
-                        <div className="flex-1 h-30 rounded-xl bg-muted/50 p-4">
+                        <div className="flex-1 h-50 rounded-xl bg-muted/50 p-4">
                             <Link href='/vote'>
                                 <h2 className="text-lg font-bold">Poll</h2>
                                 <p>After poll, token will be visible here.</p>

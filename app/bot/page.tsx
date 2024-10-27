@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from "react";
-import { AppSidebar } from "@/components/app-sidebar"
-import { NavActions } from "@/components/nav-actions"
+import { AppSidebar } from "@/components/app-sidebar";
+import { NavActions } from "@/components/nav-actions";
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbList,
     BreadcrumbPage,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { LayoutDashboardIcon } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { MdOutlinePoll } from "react-icons/md";
+import { Link2 } from "lucide-react";
+import Chat from "@/components/chat"; // Assuming you have a Chat component
 
 export default function Page() {
     const [isClient, setIsClient] = useState(false);
@@ -27,10 +31,12 @@ export default function Page() {
     if (!isClient) {
         return null;
     }
+
     return (
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
+                {/* Header with Breadcrumb */}
                 <header className="flex h-14 shrink-0 items-center gap-2">
                     <div className="flex flex-1 items-center gap-2 px-3">
                         <SidebarTrigger />
@@ -39,7 +45,8 @@ export default function Page() {
                             <BreadcrumbList>
                                 <BreadcrumbItem>
                                     <BreadcrumbPage className="line-clamp-1 flex gap-2">
-                                        <LayoutDashboardIcon className="h-[15px] w-[15px]"/>Dashboard
+                                        <MdOutlinePoll className="h-[15px] w-[15px]" />
+                                        AI Chat Bot
                                     </BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
@@ -49,11 +56,21 @@ export default function Page() {
                         <NavActions />
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-4 px-4 py-10">
-                    <div className="mx-auto h-24 w-full max-w-3xl rounded-xl bg-muted/0" />
-                    <div className="mx-auto h-full w-full max-w-3xl rounded-xl bg-muted/50" />
+
+                {/* Main Section */}
+                <div className="px-4 py-10">
+                    {/* Chat Section */}
+                    <header className="flex flex-col sm:flex-row items-center justify-between">
+                        <h1 className="text-xl sm:text-2xl font-bold">AI Coding Assistant</h1>
+                    </header>
+                    <div className="my-5">
+                        <Separator />
+                    </div>
+                    <div className="chat-container">
+                        <Chat />
+                    </div>
                 </div>
             </SidebarInset>
         </SidebarProvider>
-    )
+    );
 }

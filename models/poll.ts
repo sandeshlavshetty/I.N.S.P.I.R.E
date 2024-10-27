@@ -1,9 +1,6 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import {Schema, model} from 'mongoose';
 
-mongoose.connect(process.env.MONGO_URL);
-
-const voteSchema = mongoose.Schema({
+const voteSchema = new Schema({
     p_describe : String,
     date:{
         type: Date,
@@ -22,7 +19,6 @@ const voteSchema = mongoose.Schema({
     option5 : Number
 });
 
-module.exports = mongoose.model('poll', voteSchema);
+const Poll = model('Poll', voteSchema);
 
-
-
+export default Poll;

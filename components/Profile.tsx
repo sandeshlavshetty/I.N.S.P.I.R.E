@@ -55,7 +55,7 @@ export function Profile({ userName, pfp }: { userName: string, pfp: string }) {
                 <SidebarMenuButton className="w-fit px-1.5">
                     <div className="flex items-center space-x-2">
                         {isMounted && (
-                            <Image src={pfp} alt="Profile Picture" width={50} height={50} className="rounded-full" />
+                            <Image src={pfp} alt="Profile Picture" width={30} height={30} className="rounded-full " />
                         )}
                         <span className="truncate font-semibold">{userName}</span>
                         <ChevronDown className="opacity-50" />
