@@ -8,6 +8,7 @@ import {
   MoreHorizontal,
   Settings2,
   Star,
+  Sun,
   User,
 } from "lucide-react"
 import Link from "next/link"
@@ -57,7 +58,7 @@ export function NavActions() {
   return (
     <div className="flex items-center gap-2 text-sm">
       <Button variant="ghost" size="icon" className="h-7 w-7">
-        <Bell />
+        <Sun />
       </Button>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
