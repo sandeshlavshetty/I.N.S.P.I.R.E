@@ -1,143 +1,80 @@
-// file for all the global api calls to the database
+import Poll from '@/models/poll';
+import User from '@/models/user';
 import axios from 'axios';
-import poll from '../models/poll';
-import user from '../models/user';
-import mongoose from 'mongoose';
 
-require('dotenv').config();
-mongoose.connect(process.env.MONGO_URL);
+const apiEndpoints = {
+    getPolls: '/api/polls',
+    getPollById: (id) => `/api/polls/${id}`,
+    createPoll: '/api/polls',
+    updatePoll: (id) => `/api/polls/${id}`,
+    deletePoll: (id) => `/api/polls/${id}`,
 
-export const getPolls = async () => {
-    try {
-        const polls = await poll.find();
-        return polls;
-    } catch (error) {
-        throw error;
-    }
-}
+    getUsers: '/api/users',
+    getUserById: (id) => `/api/users/${id}`,
+    createUser: '/api/users',
+    updateUser: (id) => `/api/users/${id}`,
+    deleteUser: (id) => `/api/users/${id}`
+};
 
-export const getPollById = async (id
-) => {
-    try {
-        const poll = await poll.findById(id);
-        return poll;
-    } catch (error) {
-        throw error;
-    }
-}
+const getPolls = async () => {
+    const response = await axios.get(apiEndpoints.getPolls);
+    return response.data;
+};
 
-export const createPoll = async (pollData) => {
-    try {
-        const createdPoll = await poll.create(pollData);
-        return createdPoll;
-    } catch (error) {
-        throw error;
-    }
-}
+const getPollById = async (id) => {
+    const response = await axios.get(apiEndpoints.getPollById(id));
+    return response.data;
+};
 
-export const updatePoll = async (id, pollData) => {
-    try {
-        const poll = await poll.findById(id);
-        if (poll) {
-            await poll.update(pollData);
-            return poll;
-        }
-        return null;
-    } catch (error) {
-        throw error;
-    }
-}   
+const createPoll = async (pollData) => {
+    const response = await axios.post(apiEndpoints.createPoll, pollData);
+    return response.data;
+};
 
-export const deletePoll = async (id) => {
-    try {
-        const poll = await poll.findById(id);
-        if (poll) {
-            await poll.remove();
-            return poll;
-        }
-        return null;
-    } catch (error) {
-        throw error;
-    }
-}
+const updatePoll = async (id, pollData) => {
+    const response = await axios.put(apiEndpoints.updatePoll(id), pollData);
+    return response.data;
+};
 
-export const getUsers = async () => {
-    try {
-        const users = await user.find();
-        return users;
-    } catch (error) {
-        throw error;
-    }
-}
+const deletePoll = async (id) => {
+    const response = await axios.delete(apiEndpoints.deletePoll(id));
+    return response.data;
+};
 
-export const getUserById = async (id) => {
-    try {
-        const user = await user.findById(id);
-        return user;
-    } catch (error) {
-        throw error;
-    }
-}
+const getUsers = async () => {
+    const response = await axios.get(apiEndpoints.getUsers);
+    return response.data;
+};
 
-export const createUser = async (userData) => {
-    try {
-        const createdUser = await user.create(userData);
-        return createdUser;
-    } catch (error) {
-        throw error;
-    }
-}
+const getUserById = async (id) => {
+    const response = await axios.get(apiEndpoints.getUserById(id));
+    return response.data;
+};
 
-export const updateUser = async (id, userData) => {
-    try {
-        const user = await user.findById(id);
-        if (user) {
-            await user.update(userData);
-            return user;
-        }
-        return null;
-    } catch (error) {
-        throw error;
-    }
-}
+const createUser = async (userData) => {
+    const response = await axios.post(apiEndpoints.createUser, userData);
+    return response.data;
+};
 
-export const deleteUser = async (id) => {
-    try {
-        const user = await user.findById(id);
-        if (user) {
-            await user.remove();
-            return user;
-        }
-        return null;
-    } catch (error) {
-        throw error;
-    }
-}
+const updateUser = async (id, userData) => {
+    const response = await axios.put(apiEndpoints.updateUser(id), userData);
+    return response.data;
+};
 
-export const login = async (userData) => {
-    try {
-        const user = await user.findOne({ email: userData.email });
-        if (user) {
-            if (user.password === userData.password) {
-                return user;
-            }
-        }
-        return null;
-    } catch (error) {
-        throw error;
-    }
-}
+const deleteUser = async (id) => {
+    const response = await axios.delete(apiEndpoints.deleteUser(id));
+    return response.data;
+};
 
-export const register = async (userData) => {
-    try {
-        const user = await user.findOne({ email: userData.email });
-        if (!user) {
-            const createdUser = await user.create(userData);
-            return createdUser;
-        }
-        return null;
-    }
-    catch (error) {
-        throw error;
-    }
-}
+export {
+    getPolls,
+    getPollById,
+    createPoll,
+    updatePoll,
+    deletePoll,
+    getUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
+};
