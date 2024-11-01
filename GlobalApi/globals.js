@@ -66,7 +66,7 @@ const deleteUser = async (id) => {
     return response.data;
 };
 
-export {
+const globalApi = {
     getPolls,
     getPollById,
     createPoll,
@@ -78,3 +78,5 @@ export {
     updateUser,
     deleteUser
 };
+
+export default globalApi;
