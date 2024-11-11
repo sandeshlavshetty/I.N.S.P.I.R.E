@@ -82,7 +82,7 @@ export default function Page() {
                 {/* Main Section */}
                 <div className="px-4 py-10">
                     {/* Upload Section */}
-                    <header className="flex flex-col sm:flex-row items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-center justify-between">
                         <h1 className="text-xl sm:text-2xl font-bold">Project Showcase Board</h1>
                         <Link
                             href="/upload-project"
@@ -90,7 +90,7 @@ export default function Page() {
                         >
                             Upload Project
                         </Link>
-                    </header>
+                    </div>
                     <div className="my-5">
                         <Separator />
                     </div>
