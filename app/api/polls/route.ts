@@ -28,3 +28,17 @@ export async function POST(req: Request) {
 		return NextResponse.json({ error: "Server error" }, { status: 500 });
 	}
 }
+
+export async function GET() {
+	await connectToDB();
+
+	try {
+		const polls = await Poll.find();
+		return NextResponse.json({ success: true, polls: polls });
+	} catch (error) {
+		return NextResponse.json(
+			{ success: false, message: "Error fetching polls" },
+			{ status: 500 }
+		);
+	}
+}
