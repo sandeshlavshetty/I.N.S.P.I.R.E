@@ -2,10 +2,11 @@
 import axios from 'axios';
 import poll from '../models/poll';
 import user from '../models/user';
-import mongoose from 'mongoose';
+const mongoose = require("mongoose");
 
 require('dotenv').config();
 mongoose.connect(process.env.MONGO_URL);
+
 
 export const getPolls = async () => {
     try {
@@ -46,7 +47,7 @@ export const updatePoll = async (id, pollData) => {
     } catch (error) {
         throw error;
     }
-}   
+}
 
 export const deletePoll = async (id) => {
     try {
