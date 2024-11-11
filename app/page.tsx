@@ -8,7 +8,7 @@ export default function Home() {
 			<div className="flex flex-col justify-center items-center h-screen">
 				<h1>Welcome to INSPIRE</h1>
 				<Link href={"/poll"} className="p-6">
-					<Button>
+					<Button className="hover:scale-110">
 						Get Started
 						<MoveRight />
 					</Button>
