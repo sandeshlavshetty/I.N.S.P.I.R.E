@@ -24,51 +24,33 @@ function checkEnvVariables() {
 
 checkEnvVariables();
 
-// Connection states
-const connectionStates = {
-	Poll: false,
-	User: false,
-	Project: false,
-};
-
 // Generalized connection logic
-async function connectToDB(uri: string, dbName: keyof typeof connectionStates): Promise<void> {
-	if (connectionStates[dbName]) return;
+async function connectToDB(uri: string, dbName: string): Promise<void> {
+	// Check the current connection state
+	if (mongoose.connection.readyState === 1) {
+		console.log(`[${dbName}] MongoDB connection already established.`);
+		return;
+	}
 
 	try {
-		await mongoose.connect(uri);
-		connectionStates[dbName] = true;
-		console.log(`Connected to ${dbName} MongoDB`);
-	} catch (error) {
-		console.error(`Error connecting to ${dbName} MongoDB:`, error);
-		throw new Error(`Failed to connect to ${dbName} MongoDB`);
+		await mongoose.connect(uri, {
+			connectTimeoutMS: 10000, // Optional timeout for connection
+		});
+		console.log(`[${dbName}] Connected to MongoDB`);
+	} catch (error: any) {
+		console.error(`[${dbName}] MongoDB Connection Error:`, error.message || error);
+		throw new Error(`[${dbName}] MongoDB Connection Failed`);
 	}
 }
 
 export async function connectToPollDB() {
-	if (connectionStates["Poll"]) {
-		return;
-	} else {
-		await connectToDB(MONGO_POLL_URI, "Poll");
-	}
+	await connectToDB(MONGO_POLL_URI, "Poll");
 }
 
 export async function connectToUserDB() {
-	if (connectionStates["User"]) {
-		return;
-	} else {
-		await connectToDB(MONGO_USER_URI, "User");
-	}
+	await connectToDB(MONGO_USER_URI, "User");
 }
 
 export async function connectToProjectDB() {
-	if (connectionStates["Project"]) {
-		return;
-	} else {
-		await connectToDB(MONGO_PROJECTS_URI, "Project");
-	}
+	await connectToDB(MONGO_PROJECTS_URI, "Project");
 }
-
-connectToUserDB();
-connectToPollDB();
-connectToProjectDB();
