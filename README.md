@@ -14,17 +14,6 @@ The **I.N.S.P.I.R.E. Bus Poll System** is a web-based application that allows us
 
 ---
 
-## Required Contributions
-
-We are looking for help in the following areas to improve the I.N.S.P.I.R.E. Bus Poll System:
-
-1. **Betterment of UI**:
-   - We want to enhance the user interface to provide a more intuitive and visually appealing experience.  
-   - If you're a Figma designer or UI expert, you can check out the outline for our planned UI improvements [here](https://docs.google.com/document/d/16jH8W2DL8AzNla52-C8OGCWwq9XC0yrPLTRTNkJNhdM/edit?usp=sharing).
-   - Contributions may include redesigning the layout, improving accessibility, and refining user interaction flow.
-
----
-
 ## Getting Started
 
 ### Prerequisites:
