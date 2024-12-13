@@ -80,32 +80,8 @@ Before running the project locally, ensure you have the following installed:
 
 We welcome contributions from the community! Here’s how you can get involved:
 
-1. **Star the repository**:  
-   If you find this project useful, please consider starring the repository to show your support and help others discover it!
+Checkout [Guideline](https://github.com/sandeshlavshetty/I.N.S.P.I.R.E/discussions/41)
 
-2. **Fork the repository**:  
-   Create a personal copy of the project by clicking the "Fork" button.
-
-3. **Clone the forked repository**:
-   ```bash
-   git clone https://github.com/your-username/INSPIRE-Bus-Poll.git
-   cd INSPIRE-Bus-Poll
-   ```
-
-4. **Create a new branch**:  
-   Use a descriptive name for your branch.
-   ```bash
-   git checkout -b feature-name
-   ```
-
-5. **Make your changes**:  
-   Follow our coding standards and ensure your code is well-documented.
-
-6. **Submit a Pull Request**:  
-   Push your changes to your forked repository and open a Pull Request (PR) to the main repository with a detailed description of your changes.
-
-7. **Report Issues**:  
-   If you encounter any bugs or have suggestions for improvements, please open an issue [here](https://github.com/your-username/INSPIRE-Bus-Poll/issues).
 
 ### Coding Standards:
 - Follow [JavaScript Standard Style](https://standardjs.com/).
