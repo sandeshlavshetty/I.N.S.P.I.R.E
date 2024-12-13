@@ -9,6 +9,7 @@ import { FiGithub, FiLinkedin, FiExternalLink } from "react-icons/fi";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import avatarImg from "@/app/assets/pfp.png"
 import Link from "next/link";
+import withAuth from "@/lib/withAuth";
 
 // Sample Data
 const userData = {
@@ -44,7 +45,7 @@ const userData = {
     ]
 };
 
-export default function ProfilePage() {
+function ProfilePage() {
     return (
         <SidebarProvider>
             <div className="flex">
@@ -129,3 +130,5 @@ export default function ProfilePage() {
         </SidebarProvider>
     );
 }
+
+export default withAuth(ProfilePage);

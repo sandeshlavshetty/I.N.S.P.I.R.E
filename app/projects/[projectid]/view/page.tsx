@@ -10,8 +10,10 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/co
 import { MdOutlineVisibility } from "react-icons/md";
 import { EyeIcon } from "lucide-react";
 import { NavActions } from "@/components/nav-actions";
+import exp from "constants";
+import withAuth from "@/lib/withAuth";
 
-export default function ProjectViewPage() {
+function ProjectViewPage() {
     const { resumeId } = useParams(); // Retrieve the project ID from the URL
 
     const [project, setProject] = useState({
@@ -87,6 +89,8 @@ export default function ProjectViewPage() {
                     </div>
                 </div>
             </SidebarInset>
-y        </SidebarProvider >
+        </SidebarProvider >
     );
 }
+
+export default withAuth(ProjectViewPage);

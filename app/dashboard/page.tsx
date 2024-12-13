@@ -16,8 +16,9 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { LayoutDashboardIcon } from "lucide-react"
+import withAuth from "@/lib/withAuth";
 
-export default function Page() {
+function Page() {
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
@@ -57,3 +58,5 @@ export default function Page() {
         </SidebarProvider>
     )
 }
+
+export default withAuth(Page);

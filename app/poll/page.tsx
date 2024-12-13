@@ -16,40 +16,43 @@ import {
 } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { MdOutlinePoll } from "react-icons/md";
-import globalApi from "@/GlobalApi/globals";
 import { Button } from "@/components/ui/button";
+import withAuth from "@/lib/withAuth";
 
-export default function Page() {
-    interface Poll {
-        id: number;
-        title: number;
-        option1: string;
-        option2: string;
-        option3: string;
-        option4: string;
-    }
-
-    interface Result {
-        id: number;
-        title: string;
-        option1: number;
-        option2: number;
-        option3: number;
-        option4: number
-    }
-
-    const [polls, setPolls] = useState<Poll[]>([]);
+function Page() {
+    const [polls, setPolls] = useState<{ _id: string; name: string; options: { option: string; votes: number }[] }[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number | null }>({}); // To track selected options
+    const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: number | null }>({});
     const [successMessage, setSuccessMessage] = useState("");
-    const [results, setResults] = useState<Result[]>([]);
+    const [results, setResults] = useState<{ id: string; title: string; options: { option: string; votes: number }[] }[]>([]);
 
     useEffect(() => {
         async function fetchPolls() {
             try {
-                const data: Poll[] = await globalApi.getPolls();
-                setPolls(data);
-                console.log("Polls:", data);
+                const response = await fetch("/api/polls");
+                const data = await response.json();
+                if (Array.isArray(data.polls)) {
+                    interface PollOption {
+                        option: string;
+                        votes: number;
+                    }
+
+                    interface Poll {
+                        _id: string;
+                        name: string;
+                        options: PollOption[];
+                        status: string;
+                    }
+
+                    interface PollsResponse {
+                        polls: Poll[];
+                    }
+
+                    const activePolls = (data as PollsResponse).polls.filter((poll: Poll) => poll.status === "active");
+                    setPolls(activePolls);
+                } else {
+                    console.error("Fetched data is not an array:", data);
+                }
             } catch (error) {
                 console.error("Failed to fetch polls:", error);
             } finally {
@@ -60,13 +63,50 @@ export default function Page() {
         fetchPolls();
     }, []);
 
-    const handleVote = (pollId: number) => {
-        if (selectedOptions[pollId] !== null) {
-            // Handle the voting logic here (e.g., call an API to submit the vote)
-            setSuccessMessage(`You voted for Poll ${pollId}`);
-            setTimeout(() => setSuccessMessage(""), 3000); // Clear message after 3 seconds
+    const handleVote = async (pollId: string) => {
+        const selectedOptionIndex = selectedOptions[pollId];
+        
+        if (selectedOptionIndex !== null) {
+            try {
+                // Increment the vote count for the selected option
+                const updatedPolls = polls.map((poll) => {
+                    if (poll._id === pollId) {
+                        const updatedOptions = poll.options.map((option, index) => {
+                            if (index === selectedOptionIndex) {
+                                return { ...option, votes: option.votes + 1 }; // Increment vote count
+                            }
+                            return option;
+                        });
+                        return { ...poll, options: updatedOptions };
+                    }
+                    return poll;
+                });
+    
+                setPolls(updatedPolls); // Update local state
+    
+                const response = await fetch(`/api/polls/${pollId}`, {
+                    method: "PUT", // Change method to PUT
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ optionIndex: selectedOptionIndex }),
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    setSuccessMessage(`Vote recorded for Poll ${pollId}: ${data.message}`);
+                    setTimeout(() => setSuccessMessage(""), 3000);
+                } else {
+                    const errorData = await response.json();
+                    console.error("Failed to vote:", errorData.error);
+                    setSuccessMessage(`Failed to vote: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error("Error during voting:", error);
+                setSuccessMessage("An error occurred while submitting your vote.");
+            }
         }
-    };
+    };    
 
     return (
         <SidebarProvider>
@@ -112,29 +152,31 @@ export default function Page() {
                             </div>
                         ) : (
                             polls.map((poll) => (
-                                <div key={poll.id} className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300 w-full sm:w-1/3">
-                                    <h2 className="text-lg font-semibold">{poll.title}</h2>
+                                <div key={poll._id} className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300 w-full sm:w-1/3">
+                                    <h2 className="text-lg font-semibold">{poll.name}</h2>
                                     <p className="text-sm text-gray-500 italic">Choose your preferred option:</p>
                                     <div className="flex flex-col gap-2 mt-2">
-                                        {[poll.option1, poll.option2, poll.option3, poll.option4].map((option, optionIndex) => (
-                                            <div key={optionIndex} className="flex items-center gap-2">
+                                        {poll.options.map((option, index) => (
+                                            <div key={index} className="flex items-center gap-2">
                                                 <input
                                                     type="radio"
-                                                    name={`poll-${poll.id}`}
-                                                    id={`option${optionIndex + 1}`}
-                                                    value={optionIndex}
+                                                    name={`poll-${poll._id}`}
+                                                    id={`option${index + 1}`}
+                                                    value={index}
                                                     className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                                    onChange={() => setSelectedOptions({ ...selectedOptions, [poll.id]: optionIndex })}
+                                                    onChange={() => setSelectedOptions({ ...selectedOptions, [poll._id]: index })}
                                                 />
-                                                <label htmlFor={`option${optionIndex + 1}`} className="text-sm">{option}</label>
+                                                <label htmlFor={`option${index + 1}`} className="text-sm">{option.option}</label>
                                             </div>
                                         ))}
                                     </div>
                                     <div className="mt-4">
                                         <Button
                                             className="bg-primary text-white px-3 py-1 rounded-md hover:bg-primary-dark transition-colors duration-300"
-                                            onClick={() => handleVote(poll.id)}
-                                            disabled={selectedOptions[poll.id] === null} // Disable button if no option selected
+                                            onClick={() => {
+                                                handleVote(poll._id);
+                                            }}
+                                            disabled={selectedOptions[poll._id] === null} // Disable button if no option selected
                                         >
                                             Vote
                                         </Button>
@@ -159,10 +201,10 @@ export default function Page() {
                                     <h2 className="text-lg font-semibold">{result.title}</h2>
                                     <p className="text-sm text-gray-500 italic">Poll Results:</p>
                                     <div className="flex flex-col gap-2 mt-2">
-                                        {[result.option1, result.option2, result.option3, result.option4].map((option, optionIndex) => (
-                                            <div key={optionIndex} className="flex items-center gap-2">
-                                                <span className="text-sm">{option}</span>
-                                                <span className="text-sm text-gray-500">- {Math.floor(Math.random() * 100)} votes</span>
+                                        {result.options.map((option, index) => (
+                                            <div key={index} className="flex items-center gap-2">
+                                                <span className="text-sm">{option.option}</span>
+                                                <span className="text-sm text-gray-500">- {option.votes} votes</span>
                                             </div>
                                         ))}
                                     </div>
@@ -170,9 +212,10 @@ export default function Page() {
                             ))}
                         </div>
                     </div>
-
                 </div>
             </SidebarInset>
         </SidebarProvider >
     );
 }
+
+export default withAuth(Page);

@@ -13,8 +13,9 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MdSettings } from "react-icons/md";
+import withAuth from "@/lib/withAuth";
 
-export default function SettingsPage() {
+function SettingsPage() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -28,7 +29,7 @@ export default function SettingsPage() {
         alert("Password changed successfully!");
     };
 
-    const handleNotificationsToggle = () => {
+    const handleNotificationsToggle: () => void = () => {
         setNotifications(!notifications);
     };
 
@@ -123,3 +124,5 @@ export default function SettingsPage() {
         </SidebarProvider>
     );
 }
+
+export default withAuth(SettingsPage);

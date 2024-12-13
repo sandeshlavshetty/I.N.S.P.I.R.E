@@ -18,20 +18,20 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-	Clock,
-	Trash2,
-	Calendar as CalendarIcon,
-	RefreshCcw,
-} from "lucide-react";
-import { format } from "date-fns";
+import { Clock, RefreshCcw } from "lucide-react";
 import { useEffect } from "react";
+
+type PollOption = {
+	option: string;
+	votes: number;
+};
+
+type Poll = {
+	_id: number;
+	name: string;
+	options: PollOption[];
+	status: string;
+};
 
 export default function ExistingPolls() {
 	const [polls, setPolls] = useState<Poll[]>([]);
@@ -59,42 +59,54 @@ export default function ExistingPolls() {
 	const togglePollStatus = async (id: number, pollStatus: string) => {
 		const updatedStatus = pollStatus === "active" ? "ended" : "active";
 
+		// Optimistically update the status in the UI first
+		setPolls((prevPolls) =>
+			prevPolls.map((poll) =>
+				poll._id === id ? { ...poll, status: updatedStatus } : poll
+			)
+		);
+
 		try {
-			const response = await fetch(`api/polls/${id}`, {
+			const response = await fetch(`/api/polls/${id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ status: updatedStatus }),
 			});
 			const data = await response.json();
 
-			if (data.success) {
-				setPolls(
-					polls.map((poll) =>
-						poll._id === id ? { ...poll, status: updatedStatus } : poll
-					)
-				);
-			} else {
+			if (!data.success) {
 				console.error(data.message);
 			}
 		} catch (error) {
+			// If there is an error, revert the change made to the state
 			console.error("Error updating poll", error);
+			setPolls((prevPolls) =>
+				prevPolls.map((poll) =>
+					poll._id === id ? { ...poll, status: pollStatus } : poll
+				)
+			);
 		}
 	};
 
 	const deletePoll = async (id: number) => {
+		// Optimistically update the state by removing the deleted poll
+		setPolls((prevPolls) => prevPolls.filter((poll) => poll._id !== id));
+
 		try {
 			const response = await fetch(`/api/polls/${id}`, {
 				method: "DELETE",
 			});
-
 			const data = await response.json();
-			if (data.success) {
-				setPolls(polls.filter((poll) => poll._id !== id));
-			} else {
+
+			if (!data.success) {
 				console.error(data.message);
+				// If delete failed, re-add the poll back to the list
+				setPolls((prevPolls) => [...prevPolls, { _id: id, name: "Unknown", options: [], status: "pending" }]);
 			}
 		} catch (error) {
 			console.error("Error deleting poll:", error);
+			// If error occurs, re-add the poll back to the list
+			setPolls((prevPolls) => [...prevPolls, { _id: id, name: "Unknown", options: [], status: "pending" }]);
 		}
 	};
 
@@ -107,9 +119,7 @@ export default function ExistingPolls() {
 						<RefreshCcw />
 					</Button>
 				</div>
-				<CardDescription>
-					Manage and view results of current polls
-				</CardDescription>
+				<CardDescription>Manage and view current polls</CardDescription>
 			</CardHeader>
 			<CardContent className="w-full">
 				{loading ? (
@@ -123,7 +133,7 @@ export default function ExistingPolls() {
 								<TableHeader>
 									<TableRow>
 										<TableHead>Name</TableHead>
-										<TableHead>Timings</TableHead>
+										<TableHead>Options</TableHead>
 										<TableHead>Status</TableHead>
 										<TableHead>Actions</TableHead>
 									</TableRow>
@@ -132,17 +142,21 @@ export default function ExistingPolls() {
 									{polls.map((poll) => (
 										<TableRow key={poll._id}>
 											<TableCell>{poll.name}</TableCell>
-											<TableCell>{poll.timings.join(", ")}</TableCell>
-
+											<TableCell>
+												{poll.options
+													.map((option) => `${option.option} (${option.votes} votes)`)
+													.join(", ")}
+											</TableCell>
 											<TableCell>
 												<Badge
 													variant={
 														poll.status === "active"
 															? "default"
 															: poll.status === "pending"
-															? "secondary"
-															: "destructive"
-													}>
+																? "secondary"
+																: "destructive"
+													}
+												>
 													{poll.status}
 												</Badge>
 											</TableCell>
@@ -153,15 +167,16 @@ export default function ExistingPolls() {
 														variant="outline"
 														onClick={() =>
 															togglePollStatus(poll._id, poll.status)
-														}>
+														}
+													>
 														<Clock className="mr-2 h-4 w-4" />
 														{poll.status === "active" ? "End" : "Start"}
 													</Button>
 													<Button
 														size="sm"
 														variant="destructive"
-														onClick={() => deletePoll(poll._id)}>
-														<Trash2 className="mr-2 h-4 w-4" />
+														onClick={() => deletePoll(poll._id)}
+													>
 														Delete
 													</Button>
 												</div>
