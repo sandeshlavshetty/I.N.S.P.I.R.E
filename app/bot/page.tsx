@@ -20,8 +20,9 @@ import { useEffect, useState } from "react";
 import { MdOutlinePoll } from "react-icons/md";
 import { Link2 } from "lucide-react";
 import Chat from "@/components/chat"; // Assuming you have a Chat component
+import withAuth from "@/lib/withAuth";
 
-export default function Page() {
+function Page() {
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
@@ -74,3 +75,5 @@ export default function Page() {
         </SidebarProvider>
     );
 }
+
+export default withAuth(Page);

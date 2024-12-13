@@ -12,8 +12,9 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Separator } from "@/components/ui/separator";
 import { NavActions } from "@/components/nav-actions";
 import Link from "next/link";
+import withAuth from "@/lib/withAuth";
 
-export default function EditProjectPage() {
+function EditProjectPage() {
     const [isMounted, setIsMounted] = useState(false); // Track client-side mounting
     const router = useRouter();
     const { projectid } = useParams(); // Get the project id from the URL
@@ -167,3 +168,5 @@ export default function EditProjectPage() {
         </SidebarProvider>
     );
 }
+
+export default withAuth(EditProjectPage);

@@ -17,29 +17,22 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { generateTimeOptions } from "@/lib/utils";
 
 export default function CreateNewPoll() {
 	const [newPoll, setNewPoll] = useState({
 		name: "",
-		timings: [] as string[],
+		options: [] as string[],
 		date: undefined as Date | undefined,
 	});
+	const [newOption, setNewOption] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitMessage, setSubmitMessage] = useState("");
 
-	const createPoll = async (e: React.FormEvent) => {
+	const createPolls = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		setSubmitMessage("");
@@ -51,31 +44,31 @@ export default function CreateNewPoll() {
 				body: JSON.stringify(newPoll),
 			});
 
+			const data = await response.json();
 			if (!response.ok) {
-				const err = await response.json();
-				throw new Error(err.error);
+				throw new Error(data.error || "Failed to create poll");
 			}
 
 			setSubmitMessage("Poll created successfully!");
-			setNewPoll({ name: "", timings: [], date: undefined });
-		} catch (error) {
-			console.error("Unable to create poll.\n", error);
-			setSubmitMessage("Error creating poll. Please try again.");
+			setNewPoll({ name: "", options: [], date: undefined });
+		} catch (error: any) {
+			setSubmitMessage(error.message || "Error creating poll");
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
 
-	const addTiming = (time: string) => {
-		if (!newPoll.timings.includes(time)) {
-			setNewPoll({ ...newPoll, timings: [...newPoll.timings, time].sort() });
+	const addOption = () => {
+		if (newOption && !newPoll.options.includes(newOption)) {
+			setNewPoll({ ...newPoll, options: [...newPoll.options, newOption].sort() });
+			setNewOption("");
 		}
 	};
 
-	const removeTiming = (time: string) => {
+	const removeOption = (option: string) => {
 		setNewPoll({
 			...newPoll,
-			timings: newPoll.timings.filter((t) => t !== time),
+			options: newPoll.options.filter((opt) => opt !== option),
 		});
 	};
 
@@ -84,45 +77,42 @@ export default function CreateNewPoll() {
 			<CardHeader>
 				<CardTitle>Create New Poll</CardTitle>
 				<CardDescription>
-					Add a new bus route poll with multiple timings and a date
+					Create a poll with a name, options, and an optional date.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form onSubmit={createPoll} className="space-y-4">
+				<form onSubmit={createPolls} className="space-y-4">
 					<div>
 						<Label htmlFor="pollName">Poll Name</Label>
 						<Input
 							id="pollName"
 							value={newPoll.name}
 							onChange={(e) => setNewPoll({ ...newPoll, name: e.target.value })}
-							placeholder="e.g., Morning Route"
+							placeholder="e.g., Favorite Fruit"
 							required
 						/>
 					</div>
 					<div>
-						<Label>Timings</Label>
+						<Label>Options</Label>
 						<div className="flex items-center space-x-2">
-							<Select onValueChange={addTiming}>
-								<SelectTrigger className="w-[180px]">
-									<SelectValue placeholder="Select time" />
-								</SelectTrigger>
-								<SelectContent>
-									{generateTimeOptions().map((time) => (
-										<SelectItem key={time} value={time}>
-											{time}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+							<Input
+								value={newOption}
+								onChange={(e) => setNewOption(e.target.value)}
+								placeholder="Add an option"
+							/>
+							<Button type="button" onClick={addOption}>
+								<Plus className="h-4 w-4" />
+							</Button>
 						</div>
 						<div className="mt-2 flex flex-wrap gap-2">
-							{newPoll.timings.map((time) => (
-								<Badge key={time} variant="secondary" className="text-sm">
-									{time}
+							{newPoll.options.map((option) => (
+								<Badge key={option} variant="secondary" className="text-sm">
+									{option}
 									<button
 										type="button"
-										onClick={() => removeTiming(time)}
-										className="ml-1 hover:text-destructive">
+										onClick={() => removeOption(option)}
+										className="ml-1 hover:text-destructive"
+									>
 										<X className="h-3 w-3" />
 									</button>
 								</Badge>
@@ -130,7 +120,7 @@ export default function CreateNewPoll() {
 						</div>
 					</div>
 					<div>
-						<Label>Date</Label>
+						<Label>Date (Optional)</Label>
 						<Popover>
 							<PopoverTrigger asChild>
 								<Button
@@ -138,7 +128,8 @@ export default function CreateNewPoll() {
 									className={cn(
 										"w-full justify-start text-left font-normal",
 										!newPoll.date && "text-muted-foreground"
-									)}>
+									)}
+								>
 									<CalendarIcon className="mr-2 h-4 w-4" />
 									{newPoll.date ? (
 										format(newPoll.date, "PPP")
@@ -167,7 +158,8 @@ export default function CreateNewPoll() {
 								submitMessage.includes("Error")
 									? "text-destructive"
 									: "text-green-600"
-							)}>
+							)}
+						>
 							{submitMessage}
 						</p>
 					)}

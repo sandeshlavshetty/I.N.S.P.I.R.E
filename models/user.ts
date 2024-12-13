@@ -1,19 +1,9 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import mongoose, { Schema, model, models } from "mongoose";
 
-(async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URL);
-        console.log('Connected to MongoDB');
-    } catch (error) {
-        console.error('Error connecting to MongoDB', error);
-    }
-})();
-
-const userSchema = mongoose.Schema({
+const userSchema = new Schema({
     btid: String,
     name: String,
-    email: String,
+    email: {type: String, unique: true},
     password: String,
     role: { type: String, default: "student" },
     approval: { type: Number, default: 0 },
@@ -23,4 +13,6 @@ const userSchema = mongoose.Schema({
     provider: { type: String, default: "local" } // Track whether the user is logged in with Google or credentials.
 });
 
-module.exports = mongoose.model('user', userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+
+export default User;

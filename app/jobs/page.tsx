@@ -19,8 +19,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MdOutlinePoll } from "react-icons/md";
 import { Link2 } from "lucide-react"
+import withAuth from "@/lib/withAuth";
 
-export default function Page() {
+function Page() {
     const [isClient, setIsClient] = useState(false);
     const [projects, setProjects] = useState([
         {
@@ -130,3 +131,5 @@ export default function Page() {
         </SidebarProvider>
     );
 }
+
+export default withAuth(Page);
