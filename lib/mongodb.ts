@@ -5,7 +5,7 @@ config();
 
 const MONGO_POLL_URI = process.env.MONGO_POLL_URI || "";
 const MONGO_USER_URI = process.env.MONGO_USER_URI || "";
-const MONGO_PROJECTS_URI = process.env.MONGO_PROJECT_URI || "";
+const MONGO_PROJECT_URI = process.env.MONGO_PROJECT_URI || "";
 
 // Helper function to validate environment variables
 function checkEnvVariables() {
@@ -13,7 +13,7 @@ function checkEnvVariables() {
 
 	if (!MONGO_POLL_URI) missingVariables.push("MONGO_POLL_URI");
 	if (!MONGO_USER_URI) missingVariables.push("MONGO_URI_USER");
-	if (!MONGO_PROJECTS_URI) missingVariables.push("MONGO_URI_PROJECTS");
+	if (!MONGO_PROJECT_URI) missingVariables.push("MONGO_URI_PROJECT");
 
 	if (missingVariables.length > 0) {
 		throw new Error(
@@ -52,5 +52,5 @@ export async function connectToUserDB() {
 }
 
 export async function connectToProjectDB() {
-	await connectToDB(MONGO_PROJECTS_URI, "Project");
+	await connectToDB(MONGO_PROJECT_URI, "Project");
 }

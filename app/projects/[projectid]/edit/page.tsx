@@ -6,58 +6,93 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import { MdOutlineEdit, MdOutlinePoll } from "react-icons/md";
+import { MdOutlineEdit } from "react-icons/md";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { NavActions } from "@/components/nav-actions";
-import Link from "next/link";
 import withAuth from "@/lib/withAuth";
 
 function EditProjectPage() {
-    const [isMounted, setIsMounted] = useState(false); // Track client-side mounting
     const router = useRouter();
     const { projectid } = useParams(); // Get the project id from the URL
 
-    // Check if we are on the client-side
-    useEffect(() => {
-        setIsMounted(true); // Mark as mounted when we are on the client
-    }, []);
-
     const [project, setProject] = useState({
-        title: "Project 1: Preview",
-        description: "Small intro about the project goes here.",
-        github: "https://github.com/user/project1",
-        live: "https://project1.com",
-        previewImage: null as string | null,
+        owner: "",
+        title: "",
+        description: "",
+        githubRepoLink: "",
+        liveOnLink: "",
+        youtubeDemoLink: "",
     });
-
+    const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Fetch all projects and set the one matching projectid
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const response = await fetch("/api/projects");
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Fetched Projects:", data); // Log fetched projects for debugging
+    
+                    const selectedProject = data.find((proj: any) => proj._id === projectid);
+                    if (selectedProject) {
+                        console.log("Selected Project:", selectedProject); // Log selected project
+                        setProject(selectedProject);
+                    } else {
+                        console.error("Project not found.");
+                    }
+                } else {
+                    console.error("Failed to fetch projects.");
+                }
+            } catch (error) {
+                console.error("Error fetching projects:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+    
+        fetchProjects();
+    }, [projectid]);
 
     const handleChange = (e: any) => {
         const { name, value } = e.target;
         setProject((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleImageChange = (e: any) => {
-        const file = e.target.files[0];
-        if (file) {
-            setProject((prev) => ({ ...prev, previewImage: URL.createObjectURL(file) }));
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const response = await fetch(`/api/projects/${projectid}/edit`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: project.title,
+                    description: project.description,
+                    githubRepoLink: project.githubRepoLink,
+                    liveOnLink: project.liveOnLink,
+                }),
+            });
+
+            if (response.ok) {
+                console.log("Project updated successfully.");
+                router.push(`/projects/${projectid}`);
+            } else {
+                console.error("Failed to update project.");
+            }
+        } catch (error) {
+            console.error("Error updating project:", error);
+        } finally {
+            setIsSaving(false);
         }
     };
 
-    const handleSave = () => {
-        setIsSaving(true);
-        setTimeout(() => {
-            setIsSaving(false);
-            if (isMounted) {
-                router.push(`/projects/${projectid}`);
-            }
-        }, 2000);
-    };
-
-    if (!isMounted) {
-        return null; // Prevent rendering on the server-side
+    if (isLoading) {
+        return <p>Loading...</p>;
     }
 
     return (
@@ -85,7 +120,7 @@ function EditProjectPage() {
                 </header>
 
                 {/* Centering the form using Flexbox */}
-                <div className="flex justify-center items-center min-h-screen p-8"> 
+                <div className="flex justify-center items-center min-h-screen p-8">
                     <div className="w-full max-w-2xl bg-muted/50 p-8 rounded-md shadow-md">
                         {/* Project Title */}
                         <div className="mb-4">
@@ -118,7 +153,7 @@ function EditProjectPage() {
                             <Input
                                 type="url"
                                 name="github"
-                                value={project.github}
+                                value={project.githubRepoLink}
                                 onChange={handleChange}
                                 placeholder="https://github.com/..."
                                 className="w-full"
@@ -131,26 +166,11 @@ function EditProjectPage() {
                             <Input
                                 type="url"
                                 name="live"
-                                value={project.live}
+                                value={project.liveOnLink}
                                 onChange={handleChange}
                                 placeholder="https://yourprojectlive.com"
                                 className="w-full"
                             />
-                        </div>
-
-                        {/* Preview Image Upload */}
-                        <div className="mb-6">
-                            <label className="block mb-2 text-sm font-medium">Project Preview Image</label>
-                            <input
-                                type="file"
-                                onChange={handleImageChange}
-                                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer"
-                            />
-                            {project.previewImage && (
-                                <div className="mt-4">
-                                    <img src={project.previewImage} alt="Project Preview" className="max-w-full h-auto rounded-md" />
-                                </div>
-                            )}
                         </div>
 
                         {/* Save and Cancel Buttons */}

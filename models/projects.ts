@@ -23,7 +23,6 @@ const projectSchema = new Schema({
     },
     youtubeDemoLink: {
         type: String,
-        required: true
     }
 });
 
