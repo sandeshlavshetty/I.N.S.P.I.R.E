@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { jwtDecode } from "jwt-decode";
-
-interface DecodedToken {
-    role: string;
-}
+import { useUserContext } from "../context/UserContext";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -17,6 +13,7 @@ const Login = () => {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { setUser } = useUserContext(); // Destructure setUser from context
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,17 +29,15 @@ const Login = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                if (data.token) {
-                    const decodedToken = jwtDecode<DecodedToken>(data.token);
+                const user = data.user;
+                // Save the role to localStorage
+                localStorage.setItem("role", user.role);
 
-                    const role = decodedToken.role;
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("role", role);
+                // Set user data in context
+                setUser(user);
+                console.log("Updated User Context:", user);
 
-                    router.push(role === "student" ? "/dashboard" : "/admin");
-                } else {
-                    throw new Error("Token is missing in response");
-                }
+                router.push(user.role === "student" ? "/dashboard" : "/admin");
             } else {
                 const errorData = await response.json();
                 setError(errorData.error || "Login failed");
