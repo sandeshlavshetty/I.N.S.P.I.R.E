@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import Poll from "@/models/poll";
-import { connectToPollDB } from "@/lib/mongodb";
+import getPollModel from "@/models/poll";
 
 export async function POST(req: Request) {
     try {
-        await connectToPollDB();
+        const Poll = await getPollModel(); // Get the Poll model
 
         const { name, options, date } = await req.json();
 
@@ -22,14 +22,15 @@ export async function POST(req: Request) {
             votes: 0,
         }));
 
-        // Create a new poll with the updated schema
+        // Create a new poll
         const newPoll = new Poll({
             name,
             options: pollOptions,
             date,
+            status: "pending", // Default status
         });
 
-        console.log("New poll created.", newPoll);
+        console.log("New poll created:", newPoll);
         await newPoll.save();
 
         return NextResponse.json(
@@ -43,18 +44,15 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-    await connectToPollDB(); // Ensure this function doesn't reconnect unnecessarily
-
     try {
-        // Fetch all active polls where status is 'active'
-        const Polls = await Poll.find().lean(); // Use .lean() for better performance if you don't need Mongoose documents
+        const Poll = await getPollModel(); // Get the Poll model
 
-        // Return success response with only active polls
-        return NextResponse.json({ success: true, polls: Polls });
+        // Fetch all polls
+        const polls = await Poll.find().lean(); // Use .lean() for better performance if you don't need Mongoose documents
+
+        return NextResponse.json({ success: true, polls });
     } catch (error) {
         console.error("Error fetching polls:", error);
-
-        // Add more specific error info if necessary
         const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
 
         return NextResponse.json(

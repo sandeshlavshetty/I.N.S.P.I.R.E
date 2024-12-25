@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToProjectDB } from "@/lib/mongodb";
-import Project from "@/models/projects";
+import getProjectModel from "@/models/projects";  // Dynamic model import
 import { NextRequest } from "next/server";
 
 // Define the ProjectType interface
@@ -39,10 +38,6 @@ export async function POST(req: NextRequest) {
     try {
         console.log("Received project creation request.");
 
-        // Ensure the database connection is established
-        await connectToProjectDB();
-        console.log("Connected to project database.");
-
         // Parse the request body
         const {
             owner,
@@ -80,6 +75,9 @@ export async function POST(req: NextRequest) {
                 )
             );
         }
+
+        // Get the Project model dynamically
+        const Project = await getProjectModel();
 
         // Create a new project
         const newProject = new Project({
@@ -145,9 +143,8 @@ export async function GET() {
         if (projects.length === 0) {
             console.log("Projects list is empty. Fetching from database.");
 
-            // Ensure the database connection is established
-            await connectToProjectDB();
-            console.log("Connected to project database.");
+            // Get the Project model dynamically
+            const Project = await getProjectModel();
 
             // Fetch all projects from the database
             const dbProjects = await Project.find().sort({ createdAt: -1 });

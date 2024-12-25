@@ -1,32 +1,40 @@
 import { NextResponse } from "next/server";
-import {connectToProjectDB} from "@/lib/mongodb";
-import Project from "@/models/projects"; // Ensure the Project schema is defined
+import getProjectModel from "@/models/projects"; // Dynamic model import
 
 export async function PATCH(req: NextResponse, { params }: { params: { id: string } }) {
     const { id } = params; // Extract the project ID from the route params
 
+    if (!id) {
+        return NextResponse.json({ error: "Project ID is required." }, { status: 400 });
+    }
+
     try {
-        await connectToProjectDB(); // Connect to the database
+        // Get the Project model dynamically
+        const Project = await getProjectModel();
 
-        const body = await req.json(); // Parse the request body
+        // Parse the request body
+        const body = await req.json();
 
-        // Validate if the ID is provided
-        if (!id) {
-            return NextResponse.json({ error: "Project ID is required." }, { status: 400 });
+        // Ensure that the body contains at least one field to update
+        if (Object.keys(body).length === 0) {
+            return NextResponse.json({ error: "No fields provided for update." }, { status: 400 });
         }
 
         // Update the project in the database
         const updatedProject = await Project.findByIdAndUpdate(
             id,
             { $set: body }, // Update the fields based on the request body
-            { new: true }   // Return the updated document
+            { new: true }    // Return the updated document
         );
 
         if (!updatedProject) {
             return NextResponse.json({ error: "Project not found." }, { status: 404 });
         }
 
-        return NextResponse.json({ message: "Project updated successfully.", project: updatedProject });
+        return NextResponse.json({
+            message: "Project updated successfully.",
+            project: updatedProject
+        });
     } catch (error) {
         console.error("Error updating project:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
