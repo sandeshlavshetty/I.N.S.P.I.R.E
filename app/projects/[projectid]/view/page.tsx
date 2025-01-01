@@ -7,28 +7,59 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
-import { MdOutlineVisibility } from "react-icons/md";
 import { EyeIcon } from "lucide-react";
 import { NavActions } from "@/components/nav-actions";
-import exp from "constants";
 import withAuth from "@/lib/withAuth";
+
+// Define the ProjectType interface for the data structure
+interface ProjectType {
+    id: string;
+    owner: string;
+    title: string;
+    description: string;
+    githubRepoLink: string;
+    liveOnLink: string;
+    youtubeDemoLink?: string;
+}
 
 function ProjectViewPage() {
     const { resumeId } = useParams(); // Retrieve the project ID from the URL
 
-    const [project, setProject] = useState({
-        title: "Sample Project",
-        description: "This is a detailed description of the project, showcasing its features and purpose.",
-        videoLink: "https://www.youtube.com/embed/sample-video",
-        githubLink: "https://github.com/user/sample-project",
-        liveLink: "https://sampleproject.com",
-    });
+    const [project, setProject] = useState<ProjectType | null>(null);
 
     useEffect(() => {
-        // Simulate data fetching based on resumeId
-        // In a real application, replace with an API call
-        console.log(`Fetching project data for ID: ${resumeId}`);
+        // Fetch project data from the API
+        const fetchProjectData = async () => {
+            try {
+                const response = await fetch("/api/projects");
+                if (response.ok) {
+                    const data: ProjectType[] = await response.json();
+                    console.log("Fetched projects:", data);
+
+                    // Find the project with the matching ID
+                    const projectData = data.find((project) => project.id === resumeId);
+                    if (projectData) {
+                        setProject(projectData);
+                    } else {
+                        console.error("Project not found");
+                    }
+                } else {
+                    console.error("Failed to fetch project data");
+                }
+            } catch (error) {
+                console.error("Error fetching project data:", error);
+            }
+        };
+
+        // Call the function to fetch project data
+        fetchProjectData();
     }, [resumeId]);
+
+    if (!project) {
+        return (
+            <div>Loading project data...</div>
+        );
+    }
 
     return (
         <SidebarProvider>
@@ -59,17 +90,19 @@ function ProjectViewPage() {
                     <h1 className="text-2xl font-semibold mb-4">{project.title}</h1>
 
                     {/* YouTube Video */}
-                    <div className="aspect-w-16 aspect-h-9 mb-6">
-                        <iframe
-                            width="100%"
-                            height="315"
-                            src={project.videoLink}
-                            title="Project Video"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="rounded-md shadow-md"
-                        ></iframe>
-                    </div>
+                    {project.youtubeDemoLink && (
+                        <div className="aspect-w-16 aspect-h-9 mb-6">
+                            <iframe
+                                width="100%"
+                                height="315"
+                                src={project.youtubeDemoLink}
+                                title="Project Video"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="rounded-md shadow-md"
+                            ></iframe>
+                        </div>
+                    )}
 
                     {/* Project Description */}
                     <p className="text-lg mb-4">{project.description}</p>
@@ -77,19 +110,19 @@ function ProjectViewPage() {
                     {/* GitHub and Live Links */}
                     <div className="flex gap-4">
                         <Button asChild>
-                            <a href={project.githubLink} target="_blank" rel="noopener noreferrer">
+                            <a href={project.githubRepoLink} target="_blank" rel="noopener noreferrer">
                                 View on GitHub
                             </a>
                         </Button>
                         <Button variant="secondary" asChild>
-                            <a href={project.liveLink} target="_blank" rel="noopener noreferrer">
+                            <a href={project.liveOnLink} target="_blank" rel="noopener noreferrer">
                                 View Live Project
                             </a>
                         </Button>
                     </div>
                 </div>
             </SidebarInset>
-        </SidebarProvider >
+        </SidebarProvider>
     );
 }
 

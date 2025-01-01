@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Profile } from "./Profile";
 import { Separator } from "./ui/separator";
+import { useUser } from "@/app/context/UserContext";
 
 const navData = [
   {
@@ -62,6 +63,9 @@ const navData = [
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+  const { user } = useUser();
+
   return (
     <Sidebar className="border-r-0 bg-white" {...props}>
       {/* Header Section */}
@@ -83,7 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <Separator />
         <div className="flex justify-center items-center mt-4">
-          <Profile userName="John Doe" pfp={pfp.src} />
+          <Profile userName={user?.name ?? "Guest"} pfp={user?.avatar ?? pfp.src} />
         </div>
       </SidebarFooter>
     </Sidebar>

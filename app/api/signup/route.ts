@@ -1,25 +1,36 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import User from "@/models/user";
-import { connectToUserDB } from "@/lib/mongodb";
+import getUserModel from "@/models/user"; // Dynamic model import
+import pfp from "@/app/assets/pfp.png";
 
 // POST handler for user signup
 export async function POST(req: Request) {
     try {
         console.log("Received signup request.");
-        // Ensure the database connection is established
-        await connectToUserDB();
-        console.log("Connected to user database.");
 
         // Parse the request body
-        const { btid, name, email, password } = await req.json();
+        const {
+            btid,
+            name,
+            email,
+            password,
+            avatar = pfp.src,
+            title = "Developer",
+            bio = "",
+            socialLinks = { github: "", linkedin: "", website: "" },
+            approval = 0,
+            chosen_option = "",
+            d_optn = "",
+            role = "student",
+        } = await req.json();
+
         console.log("Parsed request data:", { btid, name, email });
 
         // Validate required fields
         if (!btid || !name || !email || !password) {
-            console.log("Validation failed: missing fields");
+            console.log("Validation failed: missing fields.");
             return NextResponse.json(
-                { error: "Please provide all required fields: btid, name, email, and password." },
+                { error: "All fields are required: btid, name, email, and password." },
                 { status: 400 }
             );
         }
@@ -27,18 +38,29 @@ export async function POST(req: Request) {
         // Validate email format
         const emailRegex = /^\S+@\S+\.\S+$/;
         if (!emailRegex.test(email)) {
-            console.log("Invalid email format.");
+            console.log("Validation failed: invalid email format.");
             return NextResponse.json(
-                { error: "Invalid email address." },
+                { error: "Invalid email address format." },
+                { status: 400 }
+            );
+        }
+
+        // Validate btid format if required (add your own regex for btid)
+        const btidRegex = /^[A-Za-z0-9]+$/; // Example pattern, replace with your actual format
+        if (!btidRegex.test(btid)) {
+            console.log("Validation failed: invalid btid format.");
+            return NextResponse.json(
+                { error: "Invalid btid format." },
                 { status: 400 }
             );
         }
 
         // Check if the email or btid already exists
+        const User = await getUserModel();
         const existingUser = await User.findOne({ $or: [{ email }, { btid }] });
         if (existingUser) {
             const conflictField = existingUser.email === email ? "email" : "btid";
-            console.log(`${conflictField} already exists.`);
+            console.log(`Validation failed: ${conflictField} already exists.`);
             return NextResponse.json(
                 { error: `${conflictField} already exists.` },
                 { status: 400 }
@@ -54,11 +76,19 @@ export async function POST(req: Request) {
             name,
             email,
             password: hashedPassword,
+            avatar,
+            title,
+            bio,
+            socialLinks,
+            approval,
+            chosen_option,
+            d_optn,
+            role,
         });
 
         // Save the user to the database
         await newUser.save();
-        console.log("User saved to database:", newUser);
+        console.log("User successfully saved to the database:", newUser);
 
         // Return a success response excluding sensitive information
         return NextResponse.json(
@@ -68,6 +98,10 @@ export async function POST(req: Request) {
                     btid: newUser.btid,
                     name: newUser.name,
                     email: newUser.email,
+                    avatar: newUser.avatar,
+                    title: newUser.title,
+                    bio: newUser.bio,
+                    socialLinks: newUser.socialLinks,
                 },
             },
             { status: 201 }
@@ -77,7 +111,7 @@ export async function POST(req: Request) {
 
         // Handle unexpected server errors
         return NextResponse.json(
-            { error: "Internal Server Error." },
+            { error: "Internal Server Error. Please try again later." },
             { status: 500 }
         );
     }

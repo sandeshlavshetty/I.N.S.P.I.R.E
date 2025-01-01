@@ -1,7 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Bell, LogOut, MoreHorizontal, Settings2, Star, Sun, Moon, User } from "lucide-react";
+import {
+  Bell,
+  LogOut,
+  MoreHorizontal,
+  Settings2,
+  Star,
+  Sun,
+  Moon,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -42,28 +51,46 @@ export function NavActions() {
       document.body.classList.remove("dark");
     }
 
-    // Check if the user is logged in (e.g., by checking local storage or cookies)
-    const token = localStorage.getItem("token"); // Replace with your auth logic
-    setIsLoggedIn(!!token);
+    // Check user authentication by calling the /api/verify-auth endpoint
+    const verifyAuth = async () => {
+      try {
+        const response = await fetch("/api/verify-auth", {
+          method: "GET",
+          credentials: "include", // Include HttpOnly cookies in the request
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setIsLoggedIn(data.authenticated);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Error verifying auth:", error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    verifyAuth();
   }, [isDarkMode]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true); // Show loading state during logout
     try {
-      // Optional: Call API to invalidate session on the server
+      // Call the API to invalidate session on the server (delete the cookie)
       const response = await fetch("/api/logout", {
         method: "POST",
-        credentials: "include",
+        credentials: "include", // Ensure cookies are included in the request
       });
 
       if (!response.ok) {
         throw new Error("Failed to log out from the server.");
       }
 
-      // Clear client-side authentication data
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
+      // Clear the client-side authentication state
       setIsLoggedIn(false);
+
+      // Redirect the user to the login page
       window.location.href = "/login"; // Redirect to homepage or login page
     } catch (error) {
       console.error("Error logging out:", error);
