@@ -128,7 +128,7 @@ function Page() {
                     </div>
                 </header>
 
-                <div className="px-4 py-10">
+                {/* <div className="px-4 py-10">
                     <div className="flex flex-col sm:flex-row items-center justify-between">
                         <h1 className="text-xl sm:text-2xl font-bold">
                             Project Showcase Board
@@ -254,7 +254,12 @@ function Page() {
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
+
+                <div className="flex flex-col items-center justify-center h-full">
+                    <h1 className="text-3xl font-bold mb-4">Coming Soon</h1>
+                    <p className="text-lg text-muted-foreground">We are working hard to bring you this feature. Stay tuned!</p>
+                </div>
             </SidebarInset>
         </SidebarProvider>
     );
