@@ -24,6 +24,7 @@ function ProfilePage() {
         if (!user) {
             // Fetch user data from your API or use default data
             const fetchedUserData = {
+                _id: "user-1234",
                 name: "Jane Doe",
                 email: "jane.doe@example.com",
                 avatar: avatarImg.src,

@@ -69,7 +69,7 @@ export async function PUT(
     { params }: { params: { id: string } } // Use string for MongoDB ObjectId
 ) {
     const { id } = params;
-    const { optionIndex } = await request.json(); // This is the index of the selected option.
+    const { optionIndex, userId } = await request.json(); // Include userId in the request body
 
     try {
         const Poll = await getPollModel(); // Dynamically fetch the Poll model
@@ -90,8 +90,20 @@ export async function PUT(
             );
         }
 
+        // Check if the user has already voted
+        const hasVoted = poll.votes.some((vote: { userId: string }) => vote.userId === userId);
+        if (hasVoted) {
+            return NextResponse.json(
+                { success: false, message: "User has already voted in this poll" },
+                { status: 400 }
+            );
+        }
+
         // Increment the vote count for the selected option
         (poll.options[optionIndex] as any).votes += 1;
+
+        // Add the user's vote to the votes array
+        poll.votes.push({ userId, chosenOption: (poll.options[optionIndex] as any).option });
 
         // Save the updated poll
         const updatedPoll = await poll.save();
@@ -109,3 +121,4 @@ export async function PUT(
         );
     }
 }
+

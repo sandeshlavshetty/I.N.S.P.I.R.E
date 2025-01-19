@@ -18,95 +18,120 @@ import { useEffect, useState } from "react";
 import { MdOutlinePoll } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import withAuth from "@/lib/withAuth";
+import { TokenCard } from "@/components/TokenCard";
+import { useUserContext } from "../context/UserContext";
 
 function Page() {
-    const [polls, setPolls] = useState<{ _id: string; name: string; options: { option: string; votes: number }[] }[]>([]);
+    const { user } = useUserContext(); // Access the user context
+    const [polls, setPolls] = useState<{
+        _id: string;
+        name: string;
+        date: Date;
+        options: { option: string; votes: number }[];
+        voters: string[];
+    }[]>([]);
+    const [votedPolls, setVotedPolls] = useState<{
+        id: string;
+        title: string;
+        chosenOption: string;
+    }[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: number | null }>({});
+    const [selectedOptions, setSelectedOptions] = useState<{
+        [key: string]: number | null;
+    }>({});
     const [successMessage, setSuccessMessage] = useState("");
-    const [results, setResults] = useState<{ id: string; title: string; options: { option: string; votes: number }[] }[]>([]);
+    const [errorMessage, setErrorMessage] = useState("");
+    const userId = user?._id;
 
     useEffect(() => {
         async function fetchPolls() {
             try {
                 const response = await fetch("/api/polls");
                 const data = await response.json();
+
                 if (Array.isArray(data.polls)) {
-                    interface PollOption {
-                        option: string;
-                        votes: number;
-                    }
+                    const activePolls = data.polls.filter(
+                        (poll: any) =>
+                            poll.status === "active" &&
+                            !poll.votes.some(
+                                (vote: { userId: string; chosenOption: string }) =>
+                                    vote.userId === userId
+                            )
+                    );
 
-                    interface Poll {
-                        _id: string;
-                        name: string;
-                        options: PollOption[];
-                        status: string;
-                    }
+                    const alreadyVotedPolls = data.polls
+                        .filter((poll: any) =>
+                            poll.votes.some(
+                                (vote: { userId: string; chosenOption: string }) =>
+                                    vote.userId === userId
+                            )
+                        )
+                        .map((poll: any) => ({
+                            id: poll._id,
+                            title: poll.name,
+                            chosenOption: poll.votes.find(
+                                (vote: { userId: string; chosenOption: string }) =>
+                                    vote.userId === userId
+                            ).chosenOption,
+                        }));
 
-                    interface PollsResponse {
-                        polls: Poll[];
-                    }
-
-                    const activePolls = (data as PollsResponse).polls.filter((poll: Poll) => poll.status === "active");
                     setPolls(activePolls);
+                    setVotedPolls(alreadyVotedPolls);
                 } else {
                     console.error("Fetched data is not an array:", data);
                 }
             } catch (error) {
                 console.error("Failed to fetch polls:", error);
+                setErrorMessage("Error fetching polls. Please try again later.");
             } finally {
                 setLoading(false);
             }
         }
 
         fetchPolls();
-    }, []);
+    }, [userId]);
 
     const handleVote = async (pollId: string) => {
         const selectedOptionIndex = selectedOptions[pollId];
-        
+
         if (selectedOptionIndex !== null) {
             try {
-                // Increment the vote count for the selected option
-                const updatedPolls = polls.map((poll) => {
-                    if (poll._id === pollId) {
-                        const updatedOptions = poll.options.map((option, index) => {
-                            if (index === selectedOptionIndex) {
-                                return { ...option, votes: option.votes + 1 }; // Increment vote count
-                            }
-                            return option;
-                        });
-                        return { ...poll, options: updatedOptions };
-                    }
-                    return poll;
-                });
-    
-                setPolls(updatedPolls); // Update local state
-    
                 const response = await fetch(`/api/polls/${pollId}`, {
-                    method: "PUT", // Change method to PUT
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ optionIndex: selectedOptionIndex }),
+                    body: JSON.stringify({ optionIndex: selectedOptionIndex, userId }),
                 });
-    
+
                 if (response.ok) {
-                    const data = await response.json();
-                    setSuccessMessage(`Vote recorded for Poll ${pollId}: ${data.message}`);
-                    setTimeout(() => setSuccessMessage(""), 3000);
+                    const poll = polls.find((poll) => poll._id === pollId);
+                    if (poll) {
+                        const chosenOption = poll.options[selectedOptionIndex].option;
+
+                        setVotedPolls((prevTokens) => [
+                            ...prevTokens,
+                            { id: pollId, title: poll.name, chosenOption },
+                        ]);
+
+                        setPolls((prevPolls) =>
+                            prevPolls.filter((poll) => poll._id !== pollId)
+                        );
+
+                        setSuccessMessage("Vote recorded successfully!");
+                        setTimeout(() => setSuccessMessage(""), 3000);
+                    }
                 } else {
                     const errorData = await response.json();
                     console.error("Failed to vote:", errorData.error);
-                    setSuccessMessage(`Failed to vote: ${errorData.error}`);
+                    setErrorMessage(errorData.error || "Failed to submit vote.");
                 }
             } catch (error) {
                 console.error("Error during voting:", error);
-                setSuccessMessage("An error occurred while submitting your vote.");
+                setErrorMessage("An error occurred while submitting your vote.");
             }
         }
-    };    
+    };
 
     return (
         <SidebarProvider>
@@ -133,88 +158,82 @@ function Page() {
                 </header>
 
                 <div className="flex flex-1 flex-col gap-4 px-4 py-10">
-                    <div className="flex flex-col sm:flex-row items-center justify-between">
-                        <h1 className="text-xl sm:text-2xl font-bold">Polls</h1>
-                    </div>
+                    <h1 className="text-xl sm:text-2xl font-bold">Active Polls</h1>
                     <Separator />
                     {successMessage && (
                         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded-md mb-4">
                             {successMessage}
                         </div>
                     )}
-                    <div className="flex flex-wrap gap-4 mx-20">
+                    {errorMessage && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md mb-4">
+                            {errorMessage}
+                        </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-4">
                         {loading ? (
-                            <div className="flex justify-center items-center w-full h-48">
-                                <svg className="animate-spin h-8 w-8 text-blue-600" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l-2-2 2-2 2 2-2 2 2 2-2 2 2 2-2 2a8 8 0 01-8-8z"></path>
-                                </svg>
-                            </div>
-                        ) : (
+                            <div>Loading...</div>
+                        ) : polls.length > 0 ? ( // Check if polls array has any items
                             polls.map((poll) => (
-                                <div key={poll._id} className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300 w-full sm:w-1/3">
+                                <div key={poll._id} className="p-4 border rounded-lg shadow-md">
                                     <h2 className="text-lg font-semibold">{poll.name}</h2>
-                                    <p className="text-sm text-gray-500 italic">Choose your preferred option:</p>
                                     <div className="flex flex-col gap-2 mt-2">
                                         {poll.options.map((option, index) => (
                                             <div key={index} className="flex items-center gap-2">
                                                 <input
                                                     type="radio"
                                                     name={`poll-${poll._id}`}
-                                                    id={`option${index + 1}`}
                                                     value={index}
-                                                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                                    onChange={() => setSelectedOptions({ ...selectedOptions, [poll._id]: index })}
+                                                    onChange={() =>
+                                                        setSelectedOptions({
+                                                            ...selectedOptions,
+                                                            [poll._id]: index,
+                                                        })
+                                                    }
                                                 />
-                                                <label htmlFor={`option${index + 1}`} className="text-sm">{option.option}</label>
+                                                <label>{option.option}</label>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="mt-4">
-                                        <Button
-                                            className="bg-primary text-white px-3 py-1 rounded-md hover:bg-primary-dark transition-colors duration-300"
-                                            onClick={() => {
-                                                handleVote(poll._id);
-                                            }}
-                                            disabled={selectedOptions[poll._id] === null} // Disable button if no option selected
-                                        >
-                                            Vote
-                                        </Button>
-                                    </div>
+                                    <Button
+                                        onClick={() => handleVote(poll._id)}
+                                        disabled={selectedOptions[poll._id] === null}
+                                    >
+                                        Vote
+                                    </Button>
                                 </div>
                             ))
+                        ) : (
+                            // Message for when there are no active polls
+                            <div className="text-gray-500 italic text-center w-full">
+                                No active polls to display. Check back later!
+                            </div>
                         )}
                     </div>
                 </div>
+
+
                 <div className="flex flex-1 flex-col gap-4 px-4 py-10">
-                    <div className="flex flex-col sm:flex-row items-center justify-between">
-                        <h1 className="text-xl sm:text-2xl font-bold">Poll Stats and Schedule</h1>
-                    </div>
+                    <h1 className="text-xl sm:text-2xl font-bold">Your Tokens</h1>
                     <Separator />
-                    <div className="flex flex-wrap gap-4 mx-20">
-                        <div className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300 w-full sm:w-1/3">
-                            <h2 className="text-lg font-semibold">Poll Stats</h2>
-                            <p className="text-sm text-gray-500 italic">View the stats of the polls</p>
-                            <div className="mt-4"></div>
-                            {results.map((result) => (
-                                <div key={result.id} className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300 w-full sm:w-1/3">
-                                    <h2 className="text-lg font-semibold">{result.title}</h2>
-                                    <p className="text-sm text-gray-500 italic">Poll Results:</p>
-                                    <div className="flex flex-col gap-2 mt-2">
-                                        {result.options.map((option, index) => (
-                                            <div key={index} className="flex items-center gap-2">
-                                                <span className="text-sm">{option.option}</span>
-                                                <span className="text-sm text-gray-500">- {option.votes} votes</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                    {votedPolls.length === 0 ? (
+                        <p>No tokens yet. Vote to earn tokens!</p>
+                    ) : (
+                        <div className="flex flex-wrap gap-4">
+                            {votedPolls.map((token) => (
+                                <TokenCard
+                                    key={token.id}
+                                    pollName={token.title}
+                                    date={new Date()} // Assuming date is available
+                                    chosenOption={token.chosenOption}
+                                />
                             ))}
                         </div>
-                    </div>
+                    )}
                 </div>
             </SidebarInset>
-        </SidebarProvider >
+        </SidebarProvider>
     );
 }
 

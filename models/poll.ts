@@ -3,9 +3,13 @@ import { getPollsDB } from "@/lib/db"; // Import the function to get the connect
 
 interface IPoll {
     name: string;
-    options: { [option: string]: number }; // Using an object with time as key and votes as value
+    options: { [option: string]: number }; // Options with vote counts
     date: Date;
     status: "pending" | "active" | "ended";
+    votes: {
+        userId: string; // ID of the user who voted
+        chosenOption: string; // The option the user selected
+    }[]; // Array to track user votes
 }
 
 const pollSchema = new Schema<IPoll>({
@@ -33,6 +37,12 @@ const pollSchema = new Schema<IPoll>({
         enum: ["pending", "active", "ended"],
         default: "pending",
     },
+    votes: [
+        {
+            userId: { type: String, required: true },
+            chosenOption: { type: String, required: true },
+        },
+    ],
 });
 
 // Ensure the model is connected to the correct Polls DB

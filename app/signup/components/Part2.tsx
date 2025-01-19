@@ -5,12 +5,12 @@ import { Label } from "@/components/ui/label";
 interface Part2Props {
     formData: any;
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleSubmit: () => void;
+    handleNext: () => void;
     handlePrevious: () => void;
     loading: boolean;
 }
 
-const Part2 = ({ formData, handleChange, handleSubmit, handlePrevious, loading }: Part2Props) => {
+const Part2 = ({ formData, handleChange, handleNext, handlePrevious, loading }: Part2Props) => {
     return (
         <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             <h2 className="text-2xl font-semibold text-center mb-6">Profile Information</h2>
@@ -61,8 +61,8 @@ const Part2 = ({ formData, handleChange, handleSubmit, handlePrevious, loading }
             <Button className="w-full mt-4" onClick={handlePrevious}>
                 Back
             </Button>
-            <Button className="w-full mt-4" onClick={handleSubmit} disabled={loading}>
-                {loading ? "Submitting..." : "Submit"}
+            <Button className="w-full mt-4" onClick={handleNext} disabled={loading}>
+                {loading ? "Submitting..." : "Next"}
             </Button>
         </form>
     );

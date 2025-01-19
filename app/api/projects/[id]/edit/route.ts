@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import getProjectModel from "@/models/projects"; // Dynamic model import
 
-export async function PATCH(req: NextResponse, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
     const { id } = params; // Extract the project ID from the route params
 
     if (!id) {
@@ -33,7 +34,7 @@ export async function PATCH(req: NextResponse, { params }: { params: { id: strin
 
         return NextResponse.json({
             message: "Project updated successfully.",
-            project: updatedProject
+            project: updatedProject,
         });
     } catch (error) {
         console.error("Error updating project:", error);
