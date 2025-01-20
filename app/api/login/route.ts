@@ -52,6 +52,7 @@ export async function POST(req: Request) {
 
         // Prepare the user data to return in the response (excluding password)
         const userData = {
+            _id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,

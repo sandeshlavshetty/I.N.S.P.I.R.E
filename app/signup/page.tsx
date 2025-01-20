@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Part1 from "./components/Part1";
 import Part2 from "./components/Part2";
+import Part3 from "./components/Part3";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import pfp from "@/app/assets/pfp.png";
@@ -44,8 +45,7 @@ const Signup = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         if (name.startsWith("socialLinks.")) {
-            // Handle nested updates for socialLinks
-            const field = name.split(".")[1]; // Extract the nested key (e.g., "github" or "linkedin")
+            const field = name.split(".")[1];
             setFormData((prev) => ({
                 ...prev,
                 socialLinks: {
@@ -56,6 +56,10 @@ const Signup = () => {
         } else {
             setFormData({ ...formData, [name]: value });
         }
+    };
+
+    const setAvatar = (avatar: string) => {
+        setFormData((prev) => ({ ...prev, avatar }));
     };
 
     const handleSubmit = async () => {
@@ -88,9 +92,17 @@ const Signup = () => {
                     <Part2
                         formData={formData}
                         handleChange={handleChange}
-                        handleSubmit={handleSubmit}
+                        handleNext={handleNext}
                         handlePrevious={handlePrevious}
                         loading={loading}
+                    />
+                )}
+                {currentStep === 3 && (
+                    <Part3
+                        formData={formData}
+                        setAvatar={setAvatar}
+                        handlePrevious={handlePrevious}
+                        handleSubmit={handleSubmit}
                     />
                 )}
             </div>
