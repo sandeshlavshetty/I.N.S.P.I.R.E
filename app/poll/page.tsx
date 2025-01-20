@@ -176,7 +176,7 @@ function Page() {
                             <div>Loading...</div>
                         ) : polls.length > 0 ? ( // Check if polls array has any items
                             polls.map((poll) => (
-                                <div key={poll._id} className="p-4 border rounded-lg shadow-md">
+                                <div key={poll._id} className="p-4 border rounded-lg shadow-md w-full sm:w-1/2 lg:w-1/3">
                                     <h2 className="text-lg font-semibold">{poll.name}</h2>
                                     <div className="flex flex-col gap-2 mt-2">
                                         {poll.options.map((option, index) => (
