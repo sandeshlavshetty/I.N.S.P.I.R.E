@@ -1,15 +1,12 @@
 import mongoose, { Schema, model, models } from "mongoose";
 import { getUsersDB } from "@/lib/db"; // Import the function to get the connection for Users DB
-import pfp from "../app/assets/pfp.png";
-
-const url = pfp.src;
 
 const userSchema = new Schema(
     {
         name: { type: String, required: true }, // User's full name
         email: { type: String, required: true, unique: true }, // Email address
         password: { type: String, required: true }, // Hashed password for authentication
-        avatar: { type: String, default: {url}}, // Profile picture URL
+        avatar: { type: String },
         title: { type: String, default: "Developer" }, // User's title/role (e.g., "Full Stack Developer")
         bio: { type: String, default: "" }, // Short bio/description about the user
         stats: {
