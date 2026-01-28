@@ -12,24 +12,13 @@ export default function withAuth(Component: React.ComponentType) {
         useEffect(() => {
             const verifyAuth = async () => {
                 try {
-                    // Show loading during verification
+                    // TESTING: Bypass auth check - always authenticate
                     setLoading(true);
-
-                    // Make a call to verify the token from cookies
-                    const response = await axios.get("/api/verify-auth", {
-                        withCredentials: true, // Include cookies with the request
-                    });
-
-                    if (response.status === 200 && response.data.authenticated) {
-                        setIsAuthenticated(true); // Set authentication status
-                    } else {
-                        router.replace("/login"); // Redirect if not authenticated
-                    }
+                    setIsAuthenticated(true);
                 } catch (error) {
                     console.error("Error verifying auth:", error);
-                    router.replace("/login"); // Redirect on error
                 } finally {
-                    setLoading(false); // Stop loading after verification
+                    setLoading(false);
                 }
             };
 

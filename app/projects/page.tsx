@@ -23,7 +23,68 @@ import withAuth from "@/lib/withAuth";
 
 function Page() {
     const [isClient, setIsClient] = useState(false);
-    const [projects, setProjects] = useState<any[]>([]);
+    const [projects, setProjects] = useState<any[]>([
+        {
+            id: 1,
+            owner: "Priya Sharma",
+            title: "E-Commerce Platform",
+            description: "Full-stack e-commerce platform with React, Node.js, and MongoDB. Features include product catalog, shopping cart, payment integration, and admin dashboard.",
+            githubRepoLink: "https://github.com/priyasharma/ecommerce-platform",
+            liveOnLink: "https://ecommerce-demo.example.com",
+            youtubeDemoLink: "https://youtube.com/watch?v=demo1",
+            views: 342,
+            likes: 28,
+            downloads: 15,
+        },
+        {
+            id: 2,
+            owner: "Rajesh Patel",
+            title: "Microservices Architecture",
+            description: "Production-ready microservices architecture with Docker, Kubernetes, and message queues. Includes monitoring, logging, and API gateway.",
+            githubRepoLink: "https://github.com/rajeshpatel/microservices",
+            liveOnLink: "https://microservices-demo.example.com",
+            youtubeDemoLink: "https://youtube.com/watch?v=demo2",
+            views: 567,
+            likes: 45,
+            downloads: 32,
+        },
+        {
+            id: 3,
+            owner: "Ananya Verma",
+            title: "Design System UI Components",
+            description: "Comprehensive design system with reusable UI components. Built with React, Storybook, and styled-components. Includes documentation and examples.",
+            githubRepoLink: "https://github.com/ananyaverma/design-system",
+            liveOnLink: "https://design-system-demo.vercel.app",
+            youtubeDemoLink: "https://youtube.com/watch?v=demo3",
+            views: 423,
+            likes: 38,
+            downloads: 28,
+        },
+        {
+            id: 4,
+            owner: "Vikram Kumar",
+            title: "Machine Learning Pipeline",
+            description: "End-to-end ML pipeline for predictive analytics. Includes data processing, model training, and REST API endpoint for inference.",
+            githubRepoLink: "https://github.com/vikramkumar/ml-pipeline",
+            liveOnLink: "https://ml-pipeline-demo.herokuapp.com",
+            youtubeDemoLink: "https://youtube.com/watch?v=demo4",
+            views: 298,
+            likes: 22,
+            downloads: 18,
+        },
+        {
+            id: 5,
+            owner: "Priya Sharma",
+            title: "Task Management App",
+            description: "Collaborative task manager with real-time updates. Built with Next.js, TypeScript, and Firebase. Features team collaboration and notifications.",
+            githubRepoLink: "https://github.com/priyasharma/task-manager",
+            liveOnLink: "https://task-manager-demo.vercel.app",
+            youtubeDemoLink: "https://youtube.com/watch?v=demo5",
+            views: 512,
+            likes: 41,
+            downloads: 35,
+        },
+    ]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [newProject, setNewProject] = useState({
         owner: "",
@@ -128,55 +189,62 @@ function Page() {
                     </div>
                 </header>
 
-                {/* <div className="px-4 py-10">
-                    <div className="flex flex-col sm:flex-row items-center justify-between">
-                        <h1 className="text-xl sm:text-2xl font-bold">
-                            Project Showcase Board
-                        </h1>
+                <div className="px-4 py-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold">Project Showcase</h1>
+                            <p className="text-sm text-muted-foreground mt-1">Discover amazing projects from the community</p>
+                        </div>
                         <button
                             onClick={() => setModalOpen(true)}
-                            className="bg-primary text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md mt-4 sm:mt-0"
+                            className="bg-primary text-white px-4 py-2 rounded-md mt-4 sm:mt-0 hover:bg-primary/90"
                         >
                             Upload Project
                         </button>
                     </div>
-                    <div className="my-5">
-                        <Separator />
-                    </div>
-                    <div className="mt-8 flex flex-wrap gap-4 justify-center">
+                    <Separator className="mb-6" />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {projects.map((project) => (
                             <div
                                 key={project.id}
-                                className="w-full max-w-sm bg-muted/50 rounded-lg shadow-md p-4 cursor-pointer"
+                                className="bg-white border rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden cursor-pointer"
                                 onClick={() => window.location.href = `/projects/${project.id}/view`}
                             >
-                                <h2 className="text-xl font-semibold mb-2">
-                                    {project.title}
-                                </h2>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                    {project.description}
-                                </p>
-                                <div className="flex gap-2 mt-4 mx-2 justify-between">
-                                    <Link
-                                        href={project.liveOnLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="rounded-full bg-primary text-white p-2 hover:bg-primary-dark"
-                                        title="Live"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <Link2 width={25} height={25} />
-                                    </Link>
-                                    <Link
-                                        href={project.githubRepoLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="rounded-full bg-primary text-white p-2 hover:bg-primary-dark"
-                                        title="GitHub"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <GitHubLogoIcon width={25} height={25} />
-                                    </Link>
+                                <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-40"></div>
+                                <div className="p-5">
+                                    <div className="mb-3">
+                                        <h3 className="text-lg font-semibold">{project.title}</h3>
+                                        <p className="text-xs text-muted-foreground mt-1">By {project.owner}</p>
+                                    </div>
+                                    <p className="text-sm text-foreground mb-4 line-clamp-2">{project.description}</p>
+                                    
+                                    <div className="flex justify-between text-sm text-muted-foreground mb-4 border-t pt-3">
+                                        <span>👁️ {project.views} views</span>
+                                        <span>❤️ {project.likes} likes</span>
+                                        <span>⬇️ {project.downloads} downloads</span>
+                                    </div>
+                                    
+                                    <div className="flex gap-2 justify-between">
+                                        <Link
+                                            href={project.liveOnLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex-1 bg-blue-100 text-blue-700 py-2 rounded text-sm font-medium hover:bg-blue-200 text-center"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Live Demo
+                                        </Link>
+                                        <Link
+                                            href={project.githubRepoLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex-1 bg-gray-900 text-white py-2 rounded text-sm font-medium hover:bg-gray-800 text-center flex items-center justify-center gap-1"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <GitHubLogoIcon width={16} height={16} /> GitHub
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -254,12 +322,7 @@ function Page() {
                             </div>
                         </div>
                     </div>
-                )} */}
-
-                <div className="flex flex-col items-center justify-center h-full">
-                    <h1 className="text-3xl font-bold mb-4">Coming Soon</h1>
-                    <p className="text-lg text-muted-foreground">We are working hard to bring you this feature. Stay tuned!</p>
-                </div>
+                )}
             </SidebarInset>
         </SidebarProvider>
     );

@@ -1,0 +1,11 @@
+{
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/verify-auth/route": "app/api/verify-auth/route.js",
+  "/profile/page": "app/profile/page.js",
+  "/api/polls/route": "app/api/polls/route.js",
+  "/poll/page": "app/poll/page.js",
+  "/api/polls/[id]/route": "app/api/polls/[id]/route.js",
+  "/admin/page": "app/admin/page.js"
+}
