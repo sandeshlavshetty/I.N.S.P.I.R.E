@@ -1,6 +1,6 @@
 import mongoose, { Schema, model, models } from "mongoose";
 import { getUsersDB } from "@/lib/db"; // Import the function to get the connection for Users DB
-import pfp from "@/app/assets/pfp.png";
+import pfp from "../app/assets/pfp.png";
 
 const url = pfp.src;
 
