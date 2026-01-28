@@ -518,37 +518,37 @@ export default function Home() {
 						<div>
 							<h3 className="text-white font-bold mb-4">Company</h3>
 							<ul className="space-y-2">
-								<li><a href="#" className="hover:text-white">About Us</a></li>
-								<li><a href="#" className="hover:text-white">Blog</a></li>
-								<li><a href="#" className="hover:text-white">Careers</a></li>
-								<li><a href="#" className="hover:text-white">Contact</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">About Us</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Blog</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Careers</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Contact</a></li>
 							</ul>
 						</div>
 						<div>
 							<h3 className="text-white font-bold mb-4">Resources</h3>
 							<ul className="space-y-2">
-								<li><a href="#" className="hover:text-white">Documentation</a></li>
-								<li><a href="#" className="hover:text-white">FAQ</a></li>
-								<li><a href="#" className="hover:text-white">Support</a></li>
-								<li><a href="#" className="hover:text-white">Community</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Documentation</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">FAQ</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Support</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Community</a></li>
 							</ul>
 						</div>
 						<div>
 							<h3 className="text-white font-bold mb-4">Legal</h3>
 							<ul className="space-y-2">
-								<li><a href="#" className="hover:text-white">Privacy</a></li>
-								<li><a href="#" className="hover:text-white">Terms</a></li>
-								<li><a href="#" className="hover:text-white">Cookies</a></li>
-								<li><a href="#" className="hover:text-white">License</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Privacy</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Terms</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Cookies</a></li>
+								<li><a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">License</a></li>
 							</ul>
 						</div>
 					</div>
 					<div className="border-t border-gray-800 pt-8 flex justify-between items-center">
 						<p>&copy; 2026 INSPIRE. All rights reserved.</p>
 						<div className="flex gap-4">
-							<a href="#" className="hover:text-white">Twitter</a>
-							<a href="#" className="hover:text-white">GitHub</a>
-							<a href="#" className="hover:text-white">LinkedIn</a>
+							<a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">Twitter</a>
+							<a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">GitHub</a>
+							<a href="https://www.linkedin.com/in/sandesh-lavshetty-143334281/" className="hover:text-white">LinkedIn</a>
 						</div>
 					</div>
 				</div>
