@@ -23,28 +23,73 @@ import withAuth from "@/lib/withAuth";
 
 function Page() {
     const [isClient, setIsClient] = useState(false);
-    const [projects, setProjects] = useState([
+    const [jobs, setJobs] = useState([
         {
             id: 1,
-            title: "Project One",
-            intro: "This is an introduction to Project One.",
-            liveLink: "https://example.com/project-one",
-            githubLink: "https://github.com/example/project-one",
+            title: "Senior Full Stack Developer",
+            company: "Tech Innovations Inc",
+            location: "Remote",
+            salary: "₹12-15 LPA",
+            description: "We are looking for an experienced Full Stack Developer with expertise in React, Node.js, and MongoDB.",
+            requirements: ["5+ years experience", "React & Node.js", "MongoDB", "AWS", "Docker"],
+            postedDate: "2024-01-15",
+            applicants: 24,
         },
         {
             id: 2,
-            title: "Project Two",
-            intro: "This is an introduction to Project Two.",
-            liveLink: "https://example.com/project-two",
-            githubLink: "https://github.com/example/project-two",
+            title: "React Developer",
+            company: "Digital Solutions Ltd",
+            location: "Bangalore",
+            salary: "₹8-10 LPA",
+            description: "Join our team to build amazing user interfaces with React and TypeScript.",
+            requirements: ["3+ years experience", "React", "TypeScript", "Tailwind CSS", "REST APIs"],
+            postedDate: "2024-01-18",
+            applicants: 45,
         },
         {
             id: 3,
-            title: "Project Three",
-            intro: "This is an introduction to Project Three.",
-            liveLink: "https://example.com/project-three",
-            githubLink: "https://github.com/example/project-three",
-        }
+            title: "Backend Engineer",
+            company: "Cloud Systems Pvt Ltd",
+            location: "Remote",
+            salary: "₹10-13 LPA",
+            description: "Design and develop scalable backend systems using microservices architecture.",
+            requirements: ["4+ years experience", "Node.js/Python", "PostgreSQL", "Kubernetes", "CI/CD"],
+            postedDate: "2024-01-12",
+            applicants: 18,
+        },
+        {
+            id: 4,
+            title: "Frontend Engineer",
+            company: "StartUp Hub",
+            location: "Hyderabad",
+            salary: "₹6-8 LPA",
+            description: "Help build innovative web applications with modern frontend technologies.",
+            requirements: ["2+ years experience", "JavaScript/React", "CSS", "Git", "Responsive Design"],
+            postedDate: "2024-01-20",
+            applicants: 62,
+        },
+        {
+            id: 5,
+            title: "Data Scientist",
+            company: "Analytics Pro",
+            location: "Remote",
+            salary: "₹11-14 LPA",
+            description: "Work with large datasets and build machine learning models to drive business insights.",
+            requirements: ["3+ years experience", "Python", "Machine Learning", "TensorFlow", "SQL"],
+            postedDate: "2024-01-19",
+            applicants: 31,
+        },
+        {
+            id: 6,
+            title: "DevOps Engineer",
+            company: "Infrastructure Plus",
+            location: "Remote",
+            salary: "₹9-12 LPA",
+            description: "Manage cloud infrastructure and automate deployment pipelines.",
+            requirements: ["4+ years experience", "AWS/GCP", "Docker", "Kubernetes", "Jenkins"],
+            postedDate: "2024-01-17",
+            applicants: 15,
+        },
     ]);
 
     useEffect(() => {
@@ -83,48 +128,56 @@ function Page() {
                 {/* Main Section */}
                 <div className="px-4 py-10">
                     {/* Upload Section */}
-                    <header className="flex flex-col sm:flex-row items-center justify-between">
-                        <h1 className="text-xl sm:text-2xl font-bold">Project Showcase Board</h1>
-                        <Link
-                            href="/upload-project"
-                            className="bg-primary text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md mt-4 sm:mt-0"
-                        >
-                            Upload Project
-                        </Link>
+                    <header className="flex flex-col sm:flex-row items-center justify-between px-4 py-6">
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold">Job Opportunities</h1>
+                            <p className="text-sm text-muted-foreground mt-1">Discover exciting career opportunities</p>
+                        </div>
+                        <button className="bg-primary text-white px-4 py-2 rounded-md mt-4 sm:mt-0 hover:bg-primary/90">
+                            Post a Job
+                        </button>
                     </header>
                     <div className="my-5">
                         <Separator />
                     </div>
-                    {/* Projects Showcase */}
-                    <div className="mt-8 flex flex-wrap gap-4 justify-center">
-                        {/* Individual Projects */}
-                        {projects.map((project) => (
-                            <div key={project.id} className="w-full max-w-sm bg-muted/50 rounded-lg shadow-md p-4">
-                                <h2 className="text-xl font-semibold mb-2">{project.title}</h2>
-                                <div className="bg-muted h-32 mb-4 rounded-md"></div>
-                                <p className="text-sm text-muted-foreground">{project.intro}</p>
-                                <div className="flex gap-2 mt-4 mx-2 justify-between">
-                                    <Link
-                                        href={project.liveLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="rounded-full bg-primary text-white p-2 hover:bg-primary-dark"
-                                        title="Live"
-                                    >
-                                        <Link2 width={25} height={25} />
-                                    </Link>
-                                    <Link
-                                        href={project.githubLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="rounded-full bg-primary text-white p-2 hover:bg-primary-dark"
-                                        title="GitHub"
-                                    >
-                                        <GitHubLogoIcon width={25} height={25} />
-                                    </Link>
+                    {/* Jobs Listing */}
+                    <div className="mt-8 px-4">
+                        <div className="space-y-4">
+                            {jobs.map((job) => (
+                                <div key={job.id} className="border rounded-lg p-5 hover:shadow-lg transition-shadow bg-white">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h3 className="text-xl font-semibold">{job.title}</h3>
+                                            <p className="text-sm text-muted-foreground">{job.company} • {job.location}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-green-600">{job.salary}</p>
+                                            <p className="text-xs text-muted-foreground">{job.applicants} applicants</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <p className="text-sm text-foreground mb-4">{job.description}</p>
+                                    
+                                    <div className="mb-4">
+                                        <p className="text-xs font-semibold mb-2 text-muted-foreground">REQUIREMENTS:</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {job.requirements.map((req, idx) => (
+                                                <span key={idx} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                                    {req}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex justify-between items-center">
+                                        <p className="text-xs text-muted-foreground">Posted on {new Date(job.postedDate).toLocaleDateString()}</p>
+                                        <button className="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-primary/90">
+                                            Apply Now
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </SidebarInset>

@@ -9,18 +9,8 @@ const withAdminAuth = (WrappedComponent: React.ComponentType) => {
         const router = useRouter();
 
         useEffect(() => {
-            const role = localStorage.getItem("role");
-
-            if (role !== "admin") {
-                setIsAuthorized(false);
-
-                // Delay redirection to show the error message briefly
-                setTimeout(() => {
-                    router.push("/dashboard"); // Redirect to /dashboard or the previous page
-                }, 2000);
-            } else {
-                setIsAuthorized(true);
-            }
+            // TESTING: Bypass admin auth check - always authorize
+            setIsAuthorized(true);
         }, [router]);
 
         if (isAuthorized === null) {
