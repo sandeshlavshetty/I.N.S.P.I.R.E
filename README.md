@@ -76,6 +76,46 @@ Before running the project locally, ensure you have the following installed:
 
 ---
 
+## REST API Endpoints
+
+Yes, this project exposes **14 REST API endpoints** built with Next.js App Router route handlers.
+
+### Authentication
+
+| # | Method | Endpoint | Description |
+|---|--------|----------|-------------|
+| 1 | `POST` | `/api/login` | Authenticate a user with email and password; returns a JWT in an HttpOnly cookie |
+| 2 | `POST` | `/api/logout` | Clear the authentication cookie and log the user out |
+| 3 | `POST` | `/api/signup` | Register a new user account |
+| 4 | `GET` | `/api/verify-auth` | Verify the current user's authentication token |
+
+### Polls
+
+| # | Method | Endpoint | Description |
+|---|--------|----------|-------------|
+| 5 | `GET` | `/api/polls` | Retrieve all polls |
+| 6 | `POST` | `/api/polls` | Create a new poll |
+| 7 | `DELETE` | `/api/polls/[id]` | Delete a poll by ID |
+| 8 | `PATCH` | `/api/polls/[id]` | Update the status of a poll by ID |
+| 9 | `PUT` | `/api/polls/[id]` | Cast a vote in a poll by ID |
+
+### Projects
+
+| # | Method | Endpoint | Description |
+|---|--------|----------|-------------|
+| 10 | `GET` | `/api/projects` | Retrieve all projects |
+| 11 | `POST` | `/api/projects` | Create a new project |
+| 12 | `PATCH` | `/api/projects/[id]/edit` | Edit an existing project by ID |
+
+### Demo Data
+
+| # | Method | Endpoint | Description |
+|---|--------|----------|-------------|
+| 13 | `GET` | `/api/seed-demo` | Get demo seeding information and sample credentials |
+| 14 | `POST` | `/api/seed-demo` | Seed the database with demo data |
+
+---
+
 ## Contributing Guidelines
 
 We welcome contributions from the community! Here’s how you can get involved:
